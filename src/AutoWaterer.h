@@ -16,6 +16,7 @@ typedef struct Sensor {
   SerialUI::Tracked::Integer rawHumidity = NULL;
   unsigned int humidity = 0;
   unsigned long prevMillisWater = 0;
+  unsigned long prevMillisHumCheck = 0;    // time of previous humidity check
 } Sensor;
 extern Sensor Sensors[NUM_SENSORS];
 

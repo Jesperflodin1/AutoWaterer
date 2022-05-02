@@ -67,7 +67,6 @@ const uint8_t NUM_DIGITS = 4;
 
 unsigned long currentMillis = 0;       // stores the value of millis() in each iteration of loop()
 unsigned long prevMillisLedUpdate = 0; // time of previous led 7 segment display update
-unsigned long prevMillisHumCheck = 0;    // time of previous humidity check
 
 SerialUI::Menu::Item::Request::UnsignedLong humidityCheckInterval = CFG_HumidityInterval;
 
@@ -199,8 +198,8 @@ void loop() {
   for (int i=0; i<NUM_SENSORS; i++) {
     if ((bool)SensorsConfig[i].enable == true) { //If current sensor is enabled
 
-      if (currentMillis - prevMillisHumCheck >= (unsigned long)humidityCheckInterval * 1000UL) {
-        prevMillisHumCheck += (unsigned long)humidityCheckInterval * 1000UL;
+      if (currentMillis - Sensors[i].prevMillisHumCheck >= (unsigned long)humidityCheckInterval * 1000UL) { 
+        Sensors[i].prevMillisHumCheck += (unsigned long)humidityCheckInterval * 1000UL;
         readHumidity(i);
         
         if (Sensors[i].humidity == 0) {
