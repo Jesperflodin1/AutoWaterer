@@ -214,8 +214,8 @@ void loop() {
         } 
 
         //Maxtime elapsed or humidity low
-        if ( (currentMillis - Sensors[i].prevMillisWater >= (unsigned long)SensorsConfig[i].maxTimeInterval*60UL*60UL*1000UL) || (Sensors[i].humidity <= SensorsConfig[i].limit && SensorsConfig[i].npump <= 2) ) {
-          Sensors[i].prevMillisWater += (unsigned long)SensorsConfig[i].minTimeInterval*60UL*60UL*1000UL;
+        if ( (currentMillis - Sensors[i].prevMillisWater >= (unsigned long)SensorsConfig[i].maxTimeInterval*60UL*60UL*1000UL && SensorsConfig[i].npump <= 2) || (Sensors[i].humidity <= SensorsConfig[i].limit && SensorsConfig[i].npump <= 2) ) {
+          Sensors[i].prevMillisWater = currentMillis;
           pump(i);
         }         
       }
