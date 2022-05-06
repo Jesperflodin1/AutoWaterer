@@ -1,5 +1,5 @@
-#ifndef _AutoWaterer_config_h
-#define _AutoWaterer_config_h
+#ifndef _GreenhouseControllerConfiguration_h
+#define _GreenhouseControllerConfiguration_h
 
 /* --- Project config --- */
 

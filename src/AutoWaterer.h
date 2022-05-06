@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <SerialUI.h>
-#include "config.h"
+#include "GreenhouseControllerConfiguration.h"
 //#define DEBUG
 //#include "DebugUtils.h"
 /* MySUI
@@ -19,19 +19,21 @@ typedef struct Sensor {
   unsigned long prevMillisHumCheck = 0;    // time of previous humidity check
 } Sensor;
 extern Sensor Sensors[NUM_SENSORS];
-
 // Values will be replaced by defaults in config.h on init
 typedef struct SensorConfig {
-  SerialUI::Menu::Item::Request::Toggle enable = 0;
-  SerialUI::Menu::Item::Request::UnsignedLong limit = 100UL;
-  SerialUI::Menu::Item::Request::UnsignedLong wateringTime = 0UL;
-  SerialUI::Menu::Item::Request::UnsignedLong maxTimeInterval = 1000UL;
-  SerialUI::Menu::Item::Request::UnsignedLong minTimeInterval = 1000UL;
-  SerialUI::Menu::Item::Request::UnsignedLong calDry = 0UL;
-  SerialUI::Menu::Item::Request::UnsignedLong calWet = 0UL;
-  unsigned int npump = 0;
+  SerialUI::Menu::Item::Request::Toggle enable = 0;                     //bool
+  SerialUI::Menu::Item::Request::UnsignedLong limit = 100UL;            //uint8_t
+  SerialUI::Menu::Item::Request::UnsignedLong wateringTime = 0UL;       //uint8_t
+  SerialUI::Menu::Item::Request::UnsignedLong maxTimeInterval = 1000UL; //uint8_t
+  SerialUI::Menu::Item::Request::UnsignedLong minTimeInterval = 1000UL; //uint8_t
+  SerialUI::Menu::Item::Request::UnsignedLong calDry = 0UL;             //uint16_t
+  SerialUI::Menu::Item::Request::UnsignedLong calWet = 0UL;             //uint16_t
+  unsigned int npump = 0;                                               //uint8_t
 } SensorConfig;
 extern SensorConfig SensorsConfig[NUM_SENSORS];
+
+
+
 
 extern SerialUI::Menu::Item::Request::UnsignedLong humidityCheckInterval; // Same interval for all sensors
 

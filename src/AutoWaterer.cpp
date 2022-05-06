@@ -174,9 +174,11 @@ void setup() {
   charWriter.writeCharAt(1, '-');
   numberWriter.writeDec2At(2, cfgVer);
   ledModule.flush();
-  delay(500);
 
-  initSensors();
+
+  //delay(500);
+
+  //initSensors();
 }
 
 

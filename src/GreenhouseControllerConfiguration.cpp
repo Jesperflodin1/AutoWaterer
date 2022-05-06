@@ -1,7 +1,8 @@
 #include "AutoWaterer.h"
 #include <EEPROMex.h>
-#include "config.h"
+#include "GreenhouseControllerConfiguration.h"
 #include <avr/wdt.h>    
+#include <EEPROMStore.h>
 
 /*
 	config.cpp -- part of the AutoWaterer project.
@@ -28,7 +29,6 @@ void readCFG() {
   EEPROM.readBlock(adr, humidityCheckInterval);
   EEPROM.readBlock(adr+sizeof(humidityCheckInterval), SensorsConfig, NUM_SENSORS);
 }
-// TODO: Fix saving an array
 void updateCFG() {
   int adr = sizeof(cfgVersion);
   EEPROM.updateBlock(adr, humidityCheckInterval);
