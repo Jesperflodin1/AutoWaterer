@@ -17,46 +17,23 @@
  */
 
 #include "GreenhouseController.h"
-#include "Display.h"
-#include "PinConfiguration.h"
-#include <digitalWriteFast.h>
-#include <ArduinoTimer.h>
 
-/* --- Constants --- */
-
-const uint8_t HUMIDITYPOWER[NUM_SENSORS] = HUMIDITYPOWER_PINS;
-const uint8_t HUMIDITYSENS[NUM_SENSORS] = HUMIDITYSENS_PINS;    // Sensor data pin for analog read
-const uint8_t RELAY[NUM_SENSORS] = RELAY_PINS;
 
 /* --- Global variables --- */
 
-//ArduinoTimer Timer1;
 unsigned long currentMillis = 0;       // stores the value of millis() in each iteration of loop()
 unsigned long prevMillisLedUpdate = 0; // time of previous led 7 segment display update
 
-SerialUI::Menu::Item::Request::UnsignedLong humidityCheckInterval = CFG_HumidityInterval;
 
-Display ledDisplay;
-
-
-void readHumidity(uint8_t sensor) {
-
-  digitalWriteFast(HUMIDITYPOWER[sensor], HIGH); //Power on humidity sensor
-  delay(200);
-  Sensors[sensor].rawHumidity = analogRead(HUMIDITYSENS[sensor]);
-  delay(200);
-  digitalWriteFast(HUMIDITYPOWER[sensor], LOW); //Power off sensor
-
-  //Convert analog values
-  Sensors[sensor].humidity = constrain((unsigned int)Sensors[sensor].rawHumidity, (unsigned int)SensorsConfig[sensor].calWet, (unsigned int)SensorsConfig[sensor].calDry);   // accept values between these limits for 4.8V on sensor 
-  Sensors[sensor].humidity  = map(Sensors[sensor].humidity , (unsigned int)SensorsConfig[sensor].calWet, (unsigned int)SensorsConfig[sensor].calDry, 100, 0); // and map them between 0 and 100%
+void GreenhouseController::setupPins() {
+  for (int i=0; i<NUM_SENSORS; i++) {
+    pinMode(HUMIDITYPOWER[i], OUTPUT);
+    pinMode(HUMIDITYSENS[i], INPUT);
+    pinMode(RELAY[i], OUTPUT);
+  }
 }
-void pump(uint8_t sensor) {
-  digitalWriteFast(RELAY[sensor], HIGH);
-  delay((int)SensorsConfig[sensor].wateringTime * 1000);
-  digitalWriteFast(RELAY[sensor], LOW);
-  SensorsConfig[sensor].npump++; //Count the pumping
-}
+
+
 
 void initSensors() {
   for (int i=0; i<NUM_SENSORS; i++) {
@@ -72,13 +49,7 @@ void initSensors() {
     }
   }   
 }
-void setupPins() {
-  for (int i=0; i<NUM_SENSORS; i++) {
-    pinMode(HUMIDITYPOWER[i], OUTPUT);
-    pinMode(HUMIDITYSENS[i], INPUT);
-    pinMode(RELAY[i], OUTPUT);
-  }
-}
+
 
 // "heartbeat" function, called periodically while connected
 /*void CustomHeartbeatCode () {
@@ -97,7 +68,6 @@ void setup() {
   setupPins();
   ledDisplay.begin();
 
-  initData();
   ledDisplay.showVersion(SetupConfig());
   delay(500);
 
