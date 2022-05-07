@@ -3,39 +3,39 @@
 #include "GreenhouseControllerConfiguration.h"
 
 class Sensor {
-    private:
-        uint16_t m_rawValue { 0 };
-        uint8_t m_humidity { 0 };
-        uint8_t m_nPump { 0 };
+private:
+    uint16_t m_rawValue { 0 };
+    uint8_t m_humidity { 0 };
+    uint8_t m_nPump { 0 };
 
-        uint8_t m_sensorId { 0 };
-        
-        unsigned long m_prevMillisPump { 0 };
-        unsigned long m_prevMillisHumidityCheck { 0 };    // time of previous humidity check
+    uint8_t m_sensorId { 0 };
 
-        GreenhouseControllerConfiguration *m_Configuration;
-    public:
-        
-        Sensor(uint8_t m_sensorId, GreenhouseControllerConfiguration &config);
+    unsigned long m_prevMillisPump { 0 };
+    unsigned long m_prevMillisHumidityCheck { 0 }; // time of previous humidity check
 
-        // Check if interval in minutes has passed for this sensor
-        bool intervalTimePassed(const uint32_t& currentMillis = millis(), bool autoReset = true);
-        
-        // Check if too much time has passed since last water pumping
-        bool pumpTimeoutPassed(const uint32_t& currentMillis = millis(), bool autoReset = true);
+    GreenhouseControllerConfiguration* m_Configuration;
 
-        // Check if minimum delay has passed
-        bool pumpDelayPassed(const uint32_t& currentMillis = millis());
+public:
+    Sensor(uint8_t m_sensorId, GreenhouseControllerConfiguration& config);
 
-        void readHumidity();
-        uint8_t getHumidity() const { return m_humidity; }
+    // Check if interval in minutes has passed for this sensor
+    bool intervalTimePassed(const uint32_t& currentMillis = millis(), bool autoReset = true);
 
-        void pump();
-        uint8_t getPumpings() const { return m_nPump; }
-        void resetPumpings() { m_nPump = 0; }
+    // Check if too much time has passed since last water pumping
+    bool pumpTimeoutPassed(const uint32_t& currentMillis = millis(), bool autoReset = true);
 
-        bool enabled();
-        bool lowHumidity();
+    // Check if minimum delay has passed
+    bool pumpDelayPassed(const uint32_t& currentMillis = millis());
+
+    void readHumidity();
+    uint8_t getHumidity() const { return m_humidity; }
+
+    void pump();
+    uint8_t getPumpings() const { return m_nPump; }
+    void resetPumpings() { m_nPump = 0; }
+
+    bool enabled();
+    bool lowHumidity();
 };
 
 #endif
