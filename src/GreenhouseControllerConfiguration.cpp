@@ -1,6 +1,7 @@
-#include "AutoWaterer.h"
+#include "GreenhouseController.h"
 #include <EEPROMex.h>
 #include "GreenhouseControllerConfiguration.h"
+#include "Sensor.h"
 #include <avr/wdt.h>    
 #include <EEPROMStore.h>
 
@@ -61,3 +62,8 @@ void PrintVersion() {
   sei();
   delay( 2000 ) ;  // force WDT to reset system
 }*/
+
+
+class GreenhouseControllerConfiguration {
+
+};
