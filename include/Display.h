@@ -1,11 +1,10 @@
 #ifndef _DISPLAY_H
 #define _DISPLAY_H
 
-//#include <AceTMI.h>
+#include <digitalWriteFast.h>
 #include <AceSegment.h> // Tm1637Module
 #include <AceSegmentWriter.h>
 #include <ace_tmi/SimpleTmi1637FastInterface.h>
-#include <digitalWriteFast.h>
 
 #include "PinConfiguration.h"
 

@@ -1,5 +1,6 @@
 #ifndef _PIN_CONFIGURATION_H
 #define _PIN_CONFIGURATION_H
+#include <Arduino.h>
 
 // Many TM1637 LED modules contain 10 nF capacitors on their DIO and CLK lines
 // which are unreasonably high. This forces a 100 microsecond delay between
