@@ -2,8 +2,6 @@
 #define _SENSOR_H
 #include "GreenhouseControllerConfiguration.h"
 
-extern GreenhouseControllerConfiguration GreenhouseConfiguration;
-
 class Sensor {
     private:
         uint16_t m_rawValue { 0 };
@@ -15,21 +13,29 @@ class Sensor {
         unsigned long m_prevMillisPump { 0 };
         unsigned long m_prevMillisHumidityCheck { 0 };    // time of previous humidity check
 
+        GreenhouseControllerConfiguration *m_Configuration;
     public:
-        Sensor(uint8_t m_sensorId);
+        
+        Sensor(uint8_t m_sensorId, GreenhouseControllerConfiguration &config);
 
         // Check if interval in minutes has passed for this sensor
-        bool intervalTimePassed(uint32_t currentMillis = millis(), bool autoReset = true);
+        bool intervalTimePassed(const uint32_t& currentMillis = millis(), bool autoReset = true);
         
-        bool pumpTimeoutPassed(uint32_t currentMillis = millis(), bool autoReset = true);
-        bool pumpDelayPassed(uint32_t currentMillis = millis());
+        // Check if too much time has passed since last water pumping
+        bool pumpTimeoutPassed(const uint32_t& currentMillis = millis(), bool autoReset = true);
+
+        // Check if minimum delay has passed
+        bool pumpDelayPassed(const uint32_t& currentMillis = millis());
 
         void readHumidity();
-        uint8_t getHumidity() { return m_humidity; }
+        uint8_t getHumidity() const { return m_humidity; }
 
         void pump();
-        uint8_t getPumpings() { return m_nPump; }
-        void resetPumpings() { m_nPump == 0; }
+        uint8_t getPumpings() const { return m_nPump; }
+        void resetPumpings() { m_nPump = 0; }
+
+        bool enabled();
+        bool lowHumidity();
 };
 
 #endif

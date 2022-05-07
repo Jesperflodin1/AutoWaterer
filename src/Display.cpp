@@ -1,12 +1,26 @@
 #include "Display.h"
 
-Display::Display() {
-    
-}
 void Display::begin() {
     m_tmiInterface.begin();
     m_ledModule.begin();
     m_ledModule.setBrightness(2);
+}
+
+bool Display::intervalTimePassed(const uint32_t& currentMillis, bool autoReset) {
+    uint32_t delta = currentMillis - m_prevMillisLedUpdate;
+
+    if (delta >= (uint32_t)m_ledUpdateInterval) 
+    { 
+        if (autoReset)
+            m_prevMillisLedUpdate = currentMillis;
+        return true; 
+    } else {
+        return false;
+    }
+}
+
+void Display::resetTimer() {
+    m_prevMillisLedUpdate = millis();
 }
 
 void Display::updateDisplay(uint8_t sensor, uint8_t humidity) {

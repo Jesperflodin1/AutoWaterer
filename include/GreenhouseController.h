@@ -4,15 +4,21 @@
 #include "GreenhouseControllerConfiguration.h"
 #include "PinConfiguration.h"
 #include "Display.h"
+#include "Sensor.h"
 
 class GreenhouseController {
 
     private:
-        Display ledDisplay;
-        GreenhouseControllerConfiguration GreenhouseConfiguration;
-
+        GreenhouseControllerConfiguration GreenhouseConfiguration {};
+        
     public:
-        void setupPins();
+        Sensor Sensors[NUM_SENSORS] = { {0, GreenhouseConfiguration}, {1, GreenhouseConfiguration}, {2, GreenhouseConfiguration} };
+
+        GreenhouseController();
+        void setupSensors();
+        
+        void readSensors();
+        void readSensor(uint8_t);
 
 };
 

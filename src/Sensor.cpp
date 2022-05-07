@@ -1,52 +1,60 @@
 #include "GreenhouseController.h"
 #include "Sensor.h"
 
-Sensor::Sensor(uint8_t sensorId) {
+Sensor::Sensor(uint8_t sensorId, GreenhouseControllerConfiguration &config) {
     m_sensorId = sensorId;
+    m_Configuration = &config;
+}
+
+bool Sensor::enabled() {
+    return m_Configuration->getSensorConfig(m_sensorId).enable;
+}
+bool Sensor::lowHumidity() {
+    return m_humidity <= m_Configuration->getSensorConfig(m_sensorId).humidityLimit;
 }
 
 void Sensor::readHumidity() {
 
-    digitalWriteFast(HUMIDITYPOWER[sensorId], HIGH); //Power on humidity sensor
+    digitalWriteFast(HUMIDITYPOWER[m_sensorId], HIGH); //Power on humidity sensor
     delay(200);
-    m_rawValue = analogRead(HUMIDITYSENS[sensorId]);
+    m_rawValue = analogRead(HUMIDITYSENS[m_sensorId]);
     delay(200);
-    digitalWriteFast(HUMIDITYPOWER[sensorId], LOW); //Power off sensor
+    digitalWriteFast(HUMIDITYPOWER[m_sensorId], LOW); //Power off sensor
 
     // Convert analog values
     // Constrain to calibration values
-    m_humidity = constrain(m_rawValue, GreenhouseConfiguration.getSensorConfig(sensorId).calibrationWet, GreenhouseConfiguration.getSensorConfig(sensorId).calibrationDry);
+    m_humidity = constrain(m_rawValue, m_Configuration->getSensorConfig(m_sensorId).calibrationWet, m_Configuration->getSensorConfig(m_sensorId).calibrationDry);
     // Map between 0 to 100%
-    m_humidity = map(m_humidity, GreenhouseConfiguration.getSensorConfig(sensorId).calibrationWet, GreenhouseConfiguration.getSensorConfig(sensorId).calibrationDry, 100, 0);
+    m_humidity = map(m_humidity, m_Configuration->getSensorConfig(m_sensorId).calibrationWet, m_Configuration->getSensorConfig(m_sensorId).calibrationDry, 100, 0);
 }
 
 void Sensor::pump() {
-    digitalWriteFast(RELAY[sensorId], HIGH);
-    delay(GreenhouseConfiguration.getSensorConfig(sensorId).pumpTime * 1000);
-    digitalWriteFast(RELAY[sensorId], LOW);
+    digitalWriteFast(RELAY[m_sensorId], HIGH);
+    delay(m_Configuration->getSensorConfig(m_sensorId).pumpTime * 1000);
+    digitalWriteFast(RELAY[m_sensorId], LOW);
     m_nPump++; //Count the pumping
 }
 
-bool Sensor::intervalTimePassed(uint32_t currentMillis, bool autoReset) {
+bool Sensor::intervalTimePassed(const uint32_t& currentMillis, bool autoReset) {
     uint32_t delta = currentMillis - m_prevMillisHumidityCheck;
 
     delta /= (60UL * 1000UL);
 
-    if (delta >= (uint32_t)GreenhouseConfiguration.getGlobalConfig().humidityCheckInterval) 
+    if (delta >= (uint32_t)m_Configuration->getGlobalConfig().humidityCheckInterval) 
     { 
         if (autoReset)
-            m_prevMillisHumidityCheck += (uint32_t)GreenhouseConfiguration.getGlobalConfig().humidityCheckInterval * 60UL * 1000UL; //minutes to milliseconds
+            m_prevMillisHumidityCheck += (uint32_t)m_Configuration->getGlobalConfig().humidityCheckInterval * 60UL * 1000UL; //minutes to milliseconds
         return true; 
     } else {
         return false;
     }
 }
-bool Sensor::pumpTimeoutPassed(uint32_t currentMillis, bool autoReset) {
+bool Sensor::pumpTimeoutPassed(const uint32_t& currentMillis, bool autoReset) {
     uint32_t delta = currentMillis - m_prevMillisPump;
 
     delta /= (60UL * 60UL * 1000UL);
 
-    if (delta >= (uint32_t)GreenhouseConfiguration.getSensorConfig(m_sensorId).pumpTimeout) 
+    if (delta >= (uint32_t)m_Configuration->getSensorConfig(m_sensorId).pumpTimeout) 
     { 
         if (autoReset)
             m_prevMillisPump = currentMillis;
@@ -55,12 +63,12 @@ bool Sensor::pumpTimeoutPassed(uint32_t currentMillis, bool autoReset) {
         return false;
     }
 }
-bool Sensor::pumpDelayPassed(uint32_t currentMillis) {
+bool Sensor::pumpDelayPassed(const uint32_t& currentMillis) {
     uint32_t delta = currentMillis - m_prevMillisPump;
 
     delta /= (60UL * 60UL * 1000UL);
 
-    if (delta >= (uint32_t)GreenhouseConfiguration.getSensorConfig(m_sensorId).pumpDelay) 
+    if (delta >= (uint32_t)m_Configuration->getSensorConfig(m_sensorId).pumpDelay) 
     { 
         return true; 
     } else {

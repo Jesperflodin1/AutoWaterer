@@ -62,8 +62,8 @@ class GreenhouseControllerConfiguration {
 
         GreenhouseControllerConfiguration();
 
-        SensorConfiguration getSensorConfig(uint8_t);
-        Configuration getGlobalConfig();
+        SensorConfiguration getSensorConfig(uint8_t sensor) { return StoredConfiguration.Data.Sensor[sensor]; }
+        Configuration getGlobalConfig() { return StoredConfiguration.Data; };
 
         void Reset();
         void Save();
@@ -74,7 +74,6 @@ class GreenhouseControllerConfiguration {
 };
 
 
-static GreenhouseControllerConfiguration GreenhouseConfiguration;
 uint8_t SetupConfig(void);
 
 void readCFG(void);

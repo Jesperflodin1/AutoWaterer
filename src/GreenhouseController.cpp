@@ -18,36 +18,48 @@
 
 #include "GreenhouseController.h"
 
-
-/* --- Global variables --- */
-
 unsigned long currentMillis = 0;       // stores the value of millis() in each iteration of loop()
-unsigned long prevMillisLedUpdate = 0; // time of previous led 7 segment display update
 
+GreenhouseController Greenhouse;
 
-void GreenhouseController::setupPins() {
+Display ledDisplay;
+
+// Setup eeprom, load config values, setup pins, init sensors, init display
+GreenhouseController::GreenhouseController() {
+    GreenhouseConfiguration = GreenhouseControllerConfiguration();
+
+    for (int i=0; i<NUM_SENSORS; i++) {
+        pinMode(HUMIDITYPOWER[i], OUTPUT);
+        pinMode(HUMIDITYSENS[i], INPUT);
+        pinMode(RELAY[i], OUTPUT);
+    }
+
+    ledDisplay.begin();
+}
+
+void GreenhouseController::setupSensors() {
   for (int i=0; i<NUM_SENSORS; i++) {
-    pinMode(HUMIDITYPOWER[i], OUTPUT);
-    pinMode(HUMIDITYSENS[i], INPUT);
-    pinMode(RELAY[i], OUTPUT);
+    Sensors[i] = Sensor(i, GreenhouseConfiguration);
   }
 }
 
-
-
-void initSensors() {
+void GreenhouseController::readSensors() {
   for (int i=0; i<NUM_SENSORS; i++) {
-    if ((bool)SensorsConfig[i].enable == true) { //If current sensor is enabled
-      readHumidity(i);
-        
-      if (Sensors[i].humidity == 0) {
-          ledDisplay.error(i);
-      } else {
-        prevMillisLedUpdate += 2000UL;
-        ledDisplay.updateDisplay(i, Sensors[i].humidity);          
-      }
+    if (Sensors[i].enabled() == true) { //If current sensor is enabled
+      
     }
   }   
+}
+
+void GreenhouseController::readSensor(uint8_t sensor) {
+    Sensors[sensor].readHumidity();
+      
+    if (Sensors[sensor].getHumidity() == 0) {
+        ledDisplay.error(sensor);
+    } else {
+      ledDisplay.resetTimer();
+      ledDisplay.updateDisplay(sensor, Sensors[sensor].getHumidity());          
+    }
 }
 
 
@@ -65,13 +77,9 @@ void initSensors() {
 
 /* **** standard setup() function **** */
 void setup() {
-  setupPins();
-  ledDisplay.begin();
+  Greenhouse = GreenhouseController();
 
-  ledDisplay.showVersion(SetupConfig());
-  delay(500);
-
-  initSensors();
+  Greenhouse.readSensors();
 }
 
 
@@ -79,34 +87,26 @@ void loop() {
   currentMillis = millis();
 
   for (int i=0; i<NUM_SENSORS; i++) {
-    if ((bool)SensorsConfig[i].enable == true) { //If current sensor is enabled
+    if (Greenhouse.Sensors[i].enabled() == true) { //If current sensor is enabled
 
-      if (currentMillis - Sensors[i].prevMillisHumCheck >= (unsigned long)humidityCheckInterval * 1000UL) { 
-        Sensors[i].prevMillisHumCheck += (unsigned long)humidityCheckInterval * 1000UL;
-        readHumidity(i);
+      if (Greenhouse.Sensors[i].intervalTimePassed(currentMillis, true)) { 
+
+        Greenhouse.readSensor(i);     
         
-        if (Sensors[i].humidity == 0) {
-            ledDisplay.error(i);
-        } else {
-          prevMillisLedUpdate = millis();
-          ledDisplay.updateDisplay(i, Sensors[i].humidity);          
-        }        
-        
-        if (currentMillis - Sensors[i].prevMillisWater >= (unsigned long)SensorsConfig[i].minTimeInterval*60UL*60UL*1000UL) {
-          SensorsConfig[i].npump = 0;        
+        if (Greenhouse.Sensors[i].pumpDelayPassed(currentMillis)) {
+          Greenhouse.Sensors[i].resetPumpings();       
         } 
 
         //Maxtime elapsed or humidity low
-        if ( (currentMillis - Sensors[i].prevMillisWater >= (unsigned long)SensorsConfig[i].maxTimeInterval*60UL*60UL*1000UL && SensorsConfig[i].npump < 2) || (Sensors[i].humidity <= SensorsConfig[i].limit && SensorsConfig[i].npump < 2) ) {
-          Sensors[i].prevMillisWater = currentMillis;
-          pump(i);
+        if ( (Greenhouse.Sensors[i].pumpTimeoutPassed(currentMillis, true) && Greenhouse.Sensors[i].getPumpings() < 2) || (Greenhouse.Sensors[i].lowHumidity() && Greenhouse.Sensors[i].getPumpings() < 2) ) {
+          Greenhouse.Sensors[i].pump();
         }         
       }
       static uint8_t lastUpdatedSensor = NUM_SENSORS-1;     
-      if (currentMillis - prevMillisLedUpdate >= 2000UL && i == (lastUpdatedSensor == NUM_SENSORS-1 ? 0 : lastUpdatedSensor+1)) {
+      if (ledDisplay.intervalTimePassed(currentMillis, true) && i == (lastUpdatedSensor == NUM_SENSORS-1 ? 0 : lastUpdatedSensor+1)) {
         lastUpdatedSensor = lastUpdatedSensor == NUM_SENSORS-1 ? 0 : lastUpdatedSensor+1;
-        prevMillisLedUpdate += 2000UL;
-        ledDisplay.updateDisplay(i, Sensors[i].humidity);                 
+
+        ledDisplay.updateDisplay(i, Greenhouse.Sensors[i].getHumidity());                 
       }
     }    
   }
