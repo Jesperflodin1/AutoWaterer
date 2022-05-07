@@ -1,13 +1,16 @@
 #include "GreenhouseControllerConfiguration.h"
 
-GreenhouseControllerConfiguration::GreenhouseControllerConfiguration() {
+GreenhouseControllerConfiguration::GreenhouseControllerConfiguration()
+{
     StoredConfiguration = EEPROMStore<GreenhouseControllerConfiguration::Configuration> {};
 }
 
-void GreenhouseControllerConfiguration::Reset() {
+void GreenhouseControllerConfiguration::Reset()
+{
     StoredConfiguration.Reset();
 }
 
-void GreenhouseControllerConfiguration::Save() {
+void GreenhouseControllerConfiguration::Save()
+{
     StoredConfiguration.Save();
 }
