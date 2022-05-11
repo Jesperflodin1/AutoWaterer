@@ -12,20 +12,16 @@ void SerialComm::begin()
 
 void SerialComm::tryHandshake(uint32_t currentMillis)
 {
-    if (prevMillisPingDelayPassed(currentMillis)) {
+    if (Serial.available() > 0) {
+        // incoming?
+        int inByte = Serial.read();
+        if ((char)inByte == 'Z' || (char)inByte == 'X') {
+            m_handshakeDone = true;
+        }
+    } else if (prevMillisPingDelayPassed(currentMillis)) {
         if (Serial.available() <= 0) {
 
             ping();
-        } else {
-            // incoming?
-            int inByte = Serial.read();
-            if ((char)inByte == 'Z') {
-                m_handshakeDone = true;
-                Serial.flush();
-                Serial.println('A');
-            } else {
-                Serial.flush();
-            }
         }
     }
 }
@@ -34,6 +30,7 @@ void SerialComm::serialLoop(uint32_t currentMillis, GreenhouseControllerConfigur
 {
     if (prevMillisPingDelayPassed(currentMillis)) {
         ping();
+        // Send sensor readings
 
         if (m_handshakeDone && prevMillisPingTimeoutPassed(currentMillis)) {
             // Tear down serial connection, wait for new
@@ -45,10 +42,13 @@ void SerialComm::serialLoop(uint32_t currentMillis, GreenhouseControllerConfigur
         char cmd = inStr.charAt(0);
         if (cmd == 'C') {
             // Send config
-            char configStr[54];
-            config.serializedConfig(configStr, ',');
+            byte configBytes[55];
+            config.serializedConfig(configBytes, ',');
 
-            Serial.println(configStr);
+            // Serial.println(configBytes);
+            for (int i = 0; i < 55; i++)
+                Serial.write(configBytes[i]);
+            Serial.println();
         } else if (cmd == 'Q') {
         }
     }

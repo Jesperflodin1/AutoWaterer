@@ -15,38 +15,37 @@ void GreenhouseControllerConfiguration::Save()
     StoredConfiguration.Save();
 }
 
-// needs a string of 54 chars
-char* GreenhouseControllerConfiguration::serializedConfig(char* emptyStr, char delimiter)
+// needs a string of 55 chars
+byte* GreenhouseControllerConfiguration::serializedConfig(byte* emptyBytes, char delimiter)
 {
     // C,1,2,3,4,5,6,77,88
 
-    char configStr[54];
+    // byte emptyBytes[54];
 
-    configStr[0] = 'C';
-    configStr[1] = delimiter;
+    emptyBytes[0] = 'C';
+    emptyBytes[1] = delimiter;
+    emptyBytes[2] = getGlobalConfig().humidityCheckInterval;
+    emptyBytes[3] = delimiter;
 
     for (int i = 0; i < NUM_SENSORS; i++) {
-        configStr[2 + 17 * i] = getSensorConfig(i).enable;
-        configStr[3 + 17 * i] = delimiter;
-        configStr[4 + 17 * i] = getSensorConfig(i).humidityLimit;
-        configStr[5 + 17 * i] = delimiter;
-        configStr[6 + 17 * i] = getSensorConfig(i).pumpTime;
-        configStr[7 + 17 * i] = delimiter;
-        configStr[8 + 17 * i] = getSensorConfig(i).maxPumpings;
-        configStr[9 + 17 * i] = delimiter;
-        configStr[10 + 17 * i] = getSensorConfig(i).pumpTimeout;
-        configStr[11 + 17 * i] = delimiter;
-        configStr[12 + 17 * i] = getSensorConfig(i).pumpDelay;
-        configStr[13 + 17 * i] = delimiter;
-        configStr[14 + 17 * i] = getSensorConfig(i).calibrationDry & 0xFF;
-        configStr[15 + 17 * i] = getSensorConfig(i).calibrationDry >> 8;
-        configStr[16 + 17 * i] = delimiter;
-        configStr[17 + 17 * i] = getSensorConfig(i).calibrationWet & 0xFF;
-        configStr[18 + 17 * i] = getSensorConfig(i).calibrationWet >> 8;
+        emptyBytes[4 + 17 * i] = getSensorConfig(i).enable;
+        emptyBytes[5 + 17 * i] = delimiter;
+        emptyBytes[6 + 17 * i] = getSensorConfig(i).humidityLimit;
+        emptyBytes[7 + 17 * i] = delimiter;
+        emptyBytes[8 + 17 * i] = getSensorConfig(i).pumpTime;
+        emptyBytes[9 + 17 * i] = delimiter;
+        emptyBytes[10 + 17 * i] = getSensorConfig(i).maxPumpings;
+        emptyBytes[11 + 17 * i] = delimiter;
+        emptyBytes[12 + 17 * i] = getSensorConfig(i).pumpTimeout;
+        emptyBytes[13 + 17 * i] = delimiter;
+        emptyBytes[14 + 17 * i] = getSensorConfig(i).pumpDelay;
+        emptyBytes[15 + 17 * i] = delimiter;
+        emptyBytes[16 + 17 * i] = getSensorConfig(i).calibrationDry & 0xFF;
+        emptyBytes[17 + 17 * i] = getSensorConfig(i).calibrationDry >> 8;
+        emptyBytes[18 + 17 * i] = delimiter;
+        emptyBytes[19 + 17 * i] = getSensorConfig(i).calibrationWet & 0xFF;
+        emptyBytes[20 + 17 * i] = getSensorConfig(i).calibrationWet >> 8;
     }
 
-    configStr[54] = '\0';
-
-    strcpy(emptyStr, configStr);
-    return emptyStr;
+    return emptyBytes;
 }

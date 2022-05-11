@@ -71,7 +71,7 @@ public:
     void Reset();
     void Save();
 
-    char* serializedConfig(char* emptyStr, char delimiter);
+    byte* serializedConfig(byte* emptyStr, char delimiter);
 
 private:
     EEPROMStore<GreenhouseControllerConfiguration::Configuration> StoredConfiguration;

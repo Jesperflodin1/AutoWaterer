@@ -123,10 +123,12 @@ void loop()
 {
     Greenhouse.currentMillis = millis();
     if (serial.connected()) {
-        ledDisplay.showUSB();
+
         serial.serialLoop(Greenhouse.currentMillis, Greenhouse.GreenhouseConfiguration);
     } else {
         serial.tryHandshake(Greenhouse.currentMillis);
+        if (serial.connected())
+            ledDisplay.showUSB();
 
         for (int i = 0; i < NUM_SENSORS; i++) {
             Greenhouse.handleSensor(i);
