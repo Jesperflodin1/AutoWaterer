@@ -77,3 +77,13 @@ void Display::showPump(uint8_t sensor)
     m_ledModule.flush();
     // delay(3000);
 }
+
+void Display::showUSB()
+{
+    m_charWriter.clear();
+    m_ledModule.flush();
+    m_charWriter.writeCharAt(0, 'U');
+    m_charWriter.writeCharAt(1, 'S');
+    m_charWriter.writeCharAt(2, 'B');
+    m_ledModule.flush();
+}

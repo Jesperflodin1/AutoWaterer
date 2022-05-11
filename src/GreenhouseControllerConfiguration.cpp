@@ -15,12 +15,12 @@ void GreenhouseControllerConfiguration::Save()
     StoredConfiguration.Save();
 }
 
-// needs a string of 53 chars
+// needs a string of 54 chars
 char* GreenhouseControllerConfiguration::serializedConfig(char* emptyStr, char delimiter)
 {
     // C,1,2,3,4,5,6,77,88
 
-    char configStr[53];
+    char configStr[54];
 
     configStr[0] = 'C';
     configStr[1] = delimiter;
@@ -44,6 +44,8 @@ char* GreenhouseControllerConfiguration::serializedConfig(char* emptyStr, char d
         configStr[17 + 17 * i] = getSensorConfig(i).calibrationWet & 0xFF;
         configStr[18 + 17 * i] = getSensorConfig(i).calibrationWet >> 8;
     }
+
+    configStr[54] = '\0';
 
     strcpy(emptyStr, configStr);
     return emptyStr;

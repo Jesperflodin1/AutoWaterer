@@ -41,6 +41,7 @@ public:
     void showVersion(uint8_t);
     void showVersion(uint8_t, uint8_t);
     void showPump(uint8_t sensor);
+    void showUSB();
 };
 
 #endif

@@ -16,11 +16,13 @@
  * responsible for the use of all these cool tools.
  */
 #include "GreenhouseController.h"
+#include "SerialComm.h"
 
 #include <HardwareSerial.h>
 
 GreenhouseController Greenhouse;
 Display ledDisplay;
+SerialComm serial;
 
 // Setup eeprom, load config values, setup pins, init sensors, init display
 GreenhouseController::GreenhouseController()
@@ -109,25 +111,25 @@ void GreenhouseController::handleSensor(uint8_t sensor)
 /* **** standard setup() function **** */
 void setup()
 {
-    Serial.begin(115200);
-    Serial.println(F("Booting..."));
 
     Greenhouse = GreenhouseController();
     Greenhouse.setupSensors();
+    serial.begin();
 
     Greenhouse.readSensors();
 }
 
 void loop()
 {
-    if (Serial.available()) {
-        int inByte = Serial.read();
-        Serial.print(inByte, DEC);
-    }
-
     Greenhouse.currentMillis = millis();
+    if (serial.connected()) {
+        ledDisplay.showUSB();
+        serial.serialLoop(Greenhouse.currentMillis, Greenhouse.GreenhouseConfiguration);
+    } else {
+        serial.tryHandshake(Greenhouse.currentMillis);
 
-    for (int i = 0; i < NUM_SENSORS; i++) {
-        Greenhouse.handleSensor(i);
+        for (int i = 0; i < NUM_SENSORS; i++) {
+            Greenhouse.handleSensor(i);
+        }
     }
 }
