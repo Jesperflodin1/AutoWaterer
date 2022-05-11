@@ -36,6 +36,12 @@ public:
 
     bool enabled();
     bool lowHumidity();
+
+    void setPrevMillisPump(uint32_t millis) { m_prevMillisPump = millis; }
+
+    uint8_t getID() const { return m_sensorId; }
+    uint32_t getPrevMillisPump() const { return m_prevMillisPump; }
+    uint32_t getPrevMillisHumidityCheck() const { return m_prevMillisHumidityCheck; }
 };
 
 #endif

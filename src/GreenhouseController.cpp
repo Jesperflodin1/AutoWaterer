@@ -60,18 +60,32 @@ void GreenhouseController::handleSensor(uint8_t sensor)
         if (Sensors[sensor].intervalTimePassed(currentMillis, true)) {
             Sensors[sensor].readHumidity();
 
+            Serial.print(F("Sensor "));
+            Serial.println(Sensors[sensor].getID());
+
+            Serial.print(F("prevMillisPump: "));
+            Serial.println(Sensors[sensor].getPrevMillisPump());
+
             if (Sensors[sensor].pumpDelayPassed(currentMillis)) {
-                Sensors[sensor].resetPumpings();
+                Serial.println(F("Reset nPump"));
+                Sensors[sensor]
+                    .resetPumpings();
             }
 
+            Serial.print(F("getPumpings: "));
+            Serial.println(Sensors[sensor].getPumpings());
+
             // Maxtime elapsed or humidity low
-            if (Sensors[sensor].pumpTimeoutPassed(currentMillis, true) || (Sensors[sensor].lowHumidity() && Sensors[sensor].getPumpings() < 2)) {
+            if (Sensors[sensor].pumpTimeoutPassed(currentMillis, false) || (Sensors[sensor].lowHumidity() && Sensors[sensor].getPumpings() < 2)) {
+                Serial.println(F("Pump triggered"));
+                Sensors[sensor].setPrevMillisPump(currentMillis);
+                ledDisplay.showPump(sensor);
                 Sensors[sensor].pump();
             }
         }
 
         if (sensor == (lastUpdatedSensor == NUM_SENSORS - 1 ? 0 : lastUpdatedSensor + 1)) {
-            if (ledDisplay.intervalTimePassed(currentMillis, true)) {
+            if (ledDisplay.intervalTimePassed()) {
                 lastUpdatedSensor = lastUpdatedSensor == NUM_SENSORS - 1 ? 0 : lastUpdatedSensor + 1;
 
                 ledDisplay.updateDisplay(sensor, Sensors[sensor].getHumidity());
