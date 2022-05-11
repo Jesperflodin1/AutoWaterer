@@ -55,6 +55,18 @@ void GreenhouseController::readSensors()
         }
     }
 }
+// 10 bytes
+byte* GreenhouseController::readSerializedSensors(byte* emptyBytes, char delimiter)
+{
+    emptyBytes[0] = 'S';
+    for (int i = 0; i < NUM_SENSORS; i++) {
+        Sensors[i].readHumidity();
+        emptyBytes[1 + 3 * i] = Sensors[i].getRawHumidity() & 0xFF;
+        emptyBytes[2 + 3 * i] = Sensors[i].getRawHumidity() >> 8;
+        emptyBytes[3 + 3 * i] = delimiter;
+    }
+    return emptyBytes;
+}
 
 void GreenhouseController::handleSensor(uint8_t sensor)
 {
@@ -62,24 +74,24 @@ void GreenhouseController::handleSensor(uint8_t sensor)
         if (Sensors[sensor].intervalTimePassed(currentMillis, true)) {
             Sensors[sensor].readHumidity();
 
-            Serial.print(F("Sensor "));
-            Serial.println(Sensors[sensor].getID());
+            // Serial.print(F("Sensor "));
+            // Serial.println(Sensors[sensor].getID());
 
-            Serial.print(F("prevMillisPump: "));
-            Serial.println(Sensors[sensor].getPrevMillisPump());
+            // Serial.print(F("prevMillisPump: "));
+            // Serial.println(Sensors[sensor].getPrevMillisPump());
 
             if (Sensors[sensor].pumpDelayPassed(currentMillis)) {
-                Serial.println(F("Reset nPump"));
+                // Serial.println(F("Reset nPump"));
                 Sensors[sensor]
                     .resetPumpings();
             }
 
-            Serial.print(F("getPumpings: "));
-            Serial.println(Sensors[sensor].getPumpings());
+            // Serial.print(F("getPumpings: "));
+            // Serial.println(Sensors[sensor].getPumpings());
 
             // Maxtime elapsed or humidity low
             if (Sensors[sensor].pumpTimeoutPassed(currentMillis, false) || (Sensors[sensor].lowHumidity() && Sensors[sensor].getPumpings() < 2)) {
-                Serial.println(F("Pump triggered"));
+                // Serial.println(F("Pump triggered"));
                 Sensors[sensor].setPrevMillisPump(currentMillis);
                 ledDisplay.showPump(sensor);
                 Sensors[sensor].pump();
@@ -124,7 +136,7 @@ void loop()
     Greenhouse.currentMillis = millis();
     if (serial.connected()) {
 
-        serial.serialLoop(Greenhouse.currentMillis, Greenhouse.GreenhouseConfiguration);
+        serial.serialLoop(Greenhouse.currentMillis, Greenhouse);
     } else {
         serial.tryHandshake(Greenhouse.currentMillis);
         if (serial.connected())

@@ -26,11 +26,16 @@ void SerialComm::tryHandshake(uint32_t currentMillis)
     }
 }
 
-void SerialComm::serialLoop(uint32_t currentMillis, GreenhouseControllerConfiguration config)
+void SerialComm::serialLoop(uint32_t currentMillis, GreenhouseController controller)
 {
     if (prevMillisPingDelayPassed(currentMillis)) {
         ping();
         // Send sensor readings
+        byte sensorBytes[10];
+        controller.readSerializedSensors(sensorBytes, ',');
+        for (int i = 0; i < 10; i++)
+            Serial.write(sensorBytes[i]); // CMD S
+        Serial.println();
 
         if (m_handshakeDone && prevMillisPingTimeoutPassed(currentMillis)) {
             // Tear down serial connection, wait for new
@@ -43,7 +48,7 @@ void SerialComm::serialLoop(uint32_t currentMillis, GreenhouseControllerConfigur
         if (cmd == 'C') {
             // Send config
             byte configBytes[55];
-            config.serializedConfig(configBytes, ',');
+            controller.GreenhouseConfiguration.serializedConfig(configBytes, ',');
 
             // Serial.println(configBytes);
             for (int i = 0; i < 55; i++)

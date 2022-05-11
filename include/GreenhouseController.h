@@ -18,6 +18,7 @@ public:
     void setupSensors();
 
     void readSensors();
+    byte* readSerializedSensors(byte* emptyBytes, char delimiter);
 
     void handleSensor(uint8_t);
 };

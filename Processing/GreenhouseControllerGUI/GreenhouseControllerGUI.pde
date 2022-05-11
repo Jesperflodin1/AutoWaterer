@@ -10,10 +10,13 @@ boolean firstContact = false;  // Whether we've heard from the microcontroller
 boolean serialInput = false;
 boolean connecting = false;
 
+boolean configDone = false;
 static boolean configRequested = true;
 byte[] configBytes = new byte[0]; //Incoming config string
 
-int pingInterval = 200;
+byte[] sensorBytes = new byte[0];
+
+int pingInterval = 2000;
 long prevMillisPing = 0;
 
 
@@ -38,7 +41,7 @@ public void draw(){
     hideConnectPrompt();
     
     if (serialInput) {
-      if (configBytes.length == 56) {
+      if (!configDone && configBytes.length == 56) {
         println("Got config data with correct length");
         //String[] splitStr = configStr.split(",",0);
         
@@ -83,7 +86,22 @@ public void draw(){
         sensor3CalWet.setText(calWet3);
 
         serialInput = false;
-      } 
+        configDone = true;
+      } else if (sensorBytes != null) {
+        String sensor1 = Integer.toString(((char) (sensorBytes[1] & 0xFF) << 8) | (sensorBytes[0] & 0xFF));
+        String sensor2 = Integer.toString(((char) (sensorBytes[4] & 0xFF) << 8) | (sensorBytes[3] & 0xFF));
+        String sensor3 = Integer.toString(((char) (sensorBytes[7] & 0xFF) << 8) | (sensorBytes[6] & 0xFF));
+        
+        sensor1RawValue.setText(sensor1);
+        sensor2RawValue.setText(sensor2);
+        sensor3RawValue.setText(sensor3);
+        sensor1RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+        sensor2RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+        sensor3RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+  
+        serialInput = false;
+        sensorBytes = null;
+      }
     } 
     long currentMillis = millis();
     if (currentMillis - prevMillisPing >= pingInterval*10) {
@@ -113,9 +131,6 @@ public void customGUI(){
   sensor1RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
   sensor2RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
   sensor3RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
-  
-  sensor1RawValue.setText("1021");
-  sensor1RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
   
   sensor1CalDry.setNumeric(0,1024,500);
   sensor2CalDry.setNumeric(0,1024,500);
@@ -198,9 +213,12 @@ void serialEvent(Serial arduinoPort) {
     if ((char)inByte == 'C') {
       println("Got config cmd");
       //configStr = arduinoPort.readStringUntil('\n');
-      configBytes = arduinoPort.readBytes(58);
+      configBytes = arduinoPort.readBytes(57);
       serialInput = true;
       println(configBytes);
+    } else if ((char)inByte == 'S') {
+      sensorBytes = arduinoPort.readBytes(12);
+      serialInput = true;
     }
     //inString = arduinoPort.readStringUntil('\n');
   }

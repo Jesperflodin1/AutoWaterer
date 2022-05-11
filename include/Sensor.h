@@ -29,6 +29,7 @@ public:
 
     void readHumidity();
     uint8_t getHumidity() const { return m_humidity; }
+    uint16_t getRawHumidity() const { return m_rawValue; }
 
     void pump();
     uint8_t getPumpings() const { return m_nPump; }
