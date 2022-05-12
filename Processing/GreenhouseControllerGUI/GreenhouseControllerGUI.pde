@@ -215,7 +215,6 @@ void serialEvent(Serial arduinoPort) {
       //configStr = arduinoPort.readStringUntil('\n');
       configBytes = arduinoPort.readBytes(57);
       serialInput = true;
-      println(configBytes);
     } else if ((char)inByte == 'S') {
       sensorBytes = arduinoPort.readBytes(12);
       serialInput = true;

@@ -15,110 +15,226 @@
  */
 
 public void humidityInterval_changed(GSlider source, GEvent event) { //_CODE_:humidityInterval:766451:
-  println("humidityInterval - GSlider >> GEvent." + event + " @ " + millis());
+  //println("humidityInterval - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "H," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+  
 } //_CODE_:humidityInterval:766451:
 
 public void sensor1Enable_clicked(GCheckbox source, GEvent event) { //_CODE_:sensor1Enable:999645:
-  println("sensor1enable - GCheckbox >> GEvent." + event + " @ " + millis());
+  //println("sensor1enable - GCheckbox >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.SELECTED) {
+    String cmd = "E,1,1";
+    arduinoPort.write(cmd);
+  } else if (arduinoPort != null && arduinoPort.active() && event == GEvent.DESELECTED) {
+    String cmd = "E,1,0";
+    arduinoPort.write(cmd);
+  }
 } //_CODE_:sensor1Enable:999645:
 
-public void sensor1Maxpumpings_changed(GSlider source, GEvent event) { //_CODE_:sensor1Maxpumpings:705855:
-  println("sensor1Maxpumpings - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor1Maxpumpings:705855:
-
-public void sensor1Pumpdelay_changed(GSlider source, GEvent event) { //_CODE_:sensor1Pumpdelay:898301:
-  println("sensor1Pumpdelay - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor1Pumpdelay:898301:
-
-public void sensor1Pumptimeout_changed(GSlider source, GEvent event) { //_CODE_:sensor1Pumptimeout:793933:
-  println("sensor1Pumptimeout - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor1Pumptimeout:793933:
-
-public void sensor1CalWet_changed(GTextField source, GEvent event) { //_CODE_:sensor1CalWet:735550:
-  println("textfield1 - GTextField >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor1CalWet:735550:
-
-public void sensor1CalDry_changed(GTextField source, GEvent event) { //_CODE_:sensor1CalDry:353032:
-  println("sensor1CalDry - GTextField >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor1CalDry:353032:
-
-public void sensor1Pumptime_changed(GSlider source, GEvent event) { //_CODE_:sensor1Pumptime:699780:
-  println("sensor1Pumptime - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor1Pumptime:699780:
-
-public void sensor1Limit_changed(GSlider source, GEvent event) { //_CODE_:sensor1Limit:916357:
-  println("sensor1Limit - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor1Limit:916357:
-
-public void sensor2Limit_changed(GSlider source, GEvent event) { //_CODE_:sensor2Limit:640917:
-  println("sensor2Limit - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor2Limit:640917:
-
-public void sensor2Pumptime_changed(GSlider source, GEvent event) { //_CODE_:sensor2Pumptime:339239:
-  println("sensor2Pumptime - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor2Pumptime:339239:
-
-public void sensor2Maxpumpings_changed(GSlider source, GEvent event) { //_CODE_:sensor2Maxpumpings:404000:
-  println("sensor2Maxpumpings - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor2Maxpumpings:404000:
-
-public void sensor2Pumpdelay_changed(GSlider source, GEvent event) { //_CODE_:sensor2Pumpdelay:807098:
-  println("sensor2Pumpdelay - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor2Pumpdelay:807098:
-
-public void sensor2Pumptimeout_changed(GSlider source, GEvent event) { //_CODE_:sensor2Pumptimeout:419186:
-  println("slider5 - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor2Pumptimeout:419186:
-
-public void sensor2CalWet_changed(GTextField source, GEvent event) { //_CODE_:sensor2CalWet:893584:
-  println("textfield1 - GTextField >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor2CalWet:893584:
-
-public void sensor2CalDry_changed(GTextField source, GEvent event) { //_CODE_:sensor2CalDry:525195:
-  println("textfield2 - GTextField >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor2CalDry:525195:
-
-public void sensor3Limit_change1(GSlider source, GEvent event) { //_CODE_:sensor3Limit:307781:
-  println("sensor3Limit - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor3Limit:307781:
-
-public void sensor3Pumptime_changed(GSlider source, GEvent event) { //_CODE_:sensor3Pumptime:412668:
-  println("sensor3Pumptime - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor3Pumptime:412668:
-
-public void sensor3Maxpumpings_changed(GSlider source, GEvent event) { //_CODE_:sensor3Maxpumpings:887263:
-  println("sensor3Maxpumpings - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor3Maxpumpings:887263:
-
 public void sensor2Enable_clicked(GCheckbox source, GEvent event) { //_CODE_:sensor2Enable:320699:
-  println("sensor2Enable - GCheckbox >> GEvent." + event + " @ " + millis());
+  //println("sensor2Enable - GCheckbox >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.SELECTED) {
+    String cmd = "E,2,1";
+    arduinoPort.write(cmd);
+  } else if (arduinoPort != null && arduinoPort.active() && event == GEvent.DESELECTED) {
+    String cmd = "E,2,0";
+    arduinoPort.write(cmd);
+  }
 } //_CODE_:sensor2Enable:320699:
 
 public void sensor3Enable_clicked(GCheckbox source, GEvent event) { //_CODE_:sensor3Enable:839573:
-  println("sensor3Enable - GCheckbox >> GEvent." + event + " @ " + millis());
+  //println("sensor3Enable - GCheckbox >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.SELECTED) {
+    String cmd = "E,3,1";
+    arduinoPort.write(cmd);
+  } else if (arduinoPort != null && arduinoPort.active() && event == GEvent.DESELECTED) {
+    String cmd = "E,3,0";
+    arduinoPort.write(cmd);
+  }
 } //_CODE_:sensor3Enable:839573:
 
-public void sensor3Pumpdelay_changed(GSlider source, GEvent event) { //_CODE_:sensor3Pumpdelay:824482:
-  println("sensor3Pumpdelay - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor3Pumpdelay:824482:
+public void sensor1Limit_changed(GSlider source, GEvent event) { //_CODE_:sensor1Limit:916357:
+  //println("sensor1Limit - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "L,1," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor1Limit:916357:
+
+public void sensor2Limit_changed(GSlider source, GEvent event) { //_CODE_:sensor2Limit:640917:
+  //println("sensor2Limit - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "L,2," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor2Limit:640917:
+
+public void sensor3Limit_change1(GSlider source, GEvent event) { //_CODE_:sensor3Limit:307781:
+  //println("sensor3Limit - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "L,3," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor3Limit:307781:
+
+public void sensor1Pumptime_changed(GSlider source, GEvent event) { //_CODE_:sensor1Pumptime:699780:
+  //println("sensor1Pumptime - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "P,1," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor1Pumptime:699780:
+
+public void sensor2Pumptime_changed(GSlider source, GEvent event) { //_CODE_:sensor2Pumptime:339239:
+  //println("sensor2Pumptime - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "P,2," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor2Pumptime:339239:
+
+public void sensor3Pumptime_changed(GSlider source, GEvent event) { //_CODE_:sensor3Pumptime:412668:
+  //println("sensor3Pumptime - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "P,3," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor3Pumptime:412668:
+
+public void sensor1Maxpumpings_changed(GSlider source, GEvent event) { //_CODE_:sensor1Maxpumpings:705855:
+  //println("sensor1Maxpumpings - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "M,1," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor1Maxpumpings:705855:
+
+public void sensor2Maxpumpings_changed(GSlider source, GEvent event) { //_CODE_:sensor2Maxpumpings:404000:
+  //println("sensor2Maxpumpings - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "M,2," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor2Maxpumpings:404000:
+
+public void sensor3Maxpumpings_changed(GSlider source, GEvent event) { //_CODE_:sensor3Maxpumpings:887263:
+  //println("sensor3Maxpumpings - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "M,3," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor3Maxpumpings:887263:
+
+public void sensor1Pumptimeout_changed(GSlider source, GEvent event) { //_CODE_:sensor1Pumptimeout:793933:
+  //println("sensor1Pumptimeout - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "T,1," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor1Pumptimeout:793933:
+
+public void sensor2Pumptimeout_changed(GSlider source, GEvent event) { //_CODE_:sensor2Pumptimeout:419186:
+  //println("slider5 - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "T,2," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor2Pumptimeout:419186:
 
 public void sensor3Pumptimeout_changed(GSlider source, GEvent event) { //_CODE_:sensor3Pumptimeout:597904:
-  println("slider6 - GSlider >> GEvent." + event + " @ " + millis());
+  //println("slider6 - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "T,3," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
 } //_CODE_:sensor3Pumptimeout:597904:
 
-public void sensor3CalWet_changed(GTextField source, GEvent event) { //_CODE_:sensor3CalWet:649370:
-  println("textfield3 - GTextField >> GEvent." + event + " @ " + millis());
-} //_CODE_:sensor3CalWet:649370:
+public void sensor1Pumpdelay_changed(GSlider source, GEvent event) { //_CODE_:sensor1Pumpdelay:898301:
+  //println("sensor1Pumpdelay - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "D,1," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor1Pumpdelay:898301:
+
+public void sensor2Pumpdelay_changed(GSlider source, GEvent event) { //_CODE_:sensor2Pumpdelay:807098:
+  //println("sensor2Pumpdelay - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "D,2," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor2Pumpdelay:807098:
+
+public void sensor3Pumpdelay_changed(GSlider source, GEvent event) { //_CODE_:sensor3Pumpdelay:824482:
+  //println("sensor3Pumpdelay - GSlider >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.RELEASED) {
+    String cmd = "D,3," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor3Pumpdelay:824482:
+
+
+public void sensor1CalDry_changed(GTextField source, GEvent event) { //_CODE_:sensor1CalDry:353032:
+  //println("sensor1CalDry - GTextField >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && (event == GEvent.LOST_FOCUS || event == GEvent.ENTERED)) {
+    String cmd = "L,1," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor1CalDry:353032:
+
+public void sensor2CalDry_changed(GTextField source, GEvent event) { //_CODE_:sensor2CalDry:525195:
+  //println("textfield2 - GTextField >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && (event == GEvent.LOST_FOCUS || event == GEvent.ENTERED)) {
+    String cmd = "L,2," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor2CalDry:525195:
 
 public void sensor3CalDry_changed(GTextField source, GEvent event) { //_CODE_:sensor3CalDry:333581:
-  println("textfield4 - GTextField >> GEvent." + event + " @ " + millis());
+  //println("textfield4 - GTextField >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && (event == GEvent.LOST_FOCUS || event == GEvent.ENTERED)) {
+    String cmd = "L,3," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
 } //_CODE_:sensor3CalDry:333581:
 
+
+public void sensor1CalWet_changed(GTextField source, GEvent event) { //_CODE_:sensor1CalWet:735550:
+  //println("textfield1 - GTextField >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && (event == GEvent.LOST_FOCUS || event == GEvent.ENTERED)) {
+    String cmd = "W,1," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor1CalWet:735550:
+
+public void sensor2CalWet_changed(GTextField source, GEvent event) { //_CODE_:sensor2CalWet:893584:
+  //println("textfield1 - GTextField >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && (event == GEvent.LOST_FOCUS || event == GEvent.ENTERED)) {
+    String cmd = "W,2," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor2CalWet:893584:
+
+public void sensor3CalWet_changed(GTextField source, GEvent event) { //_CODE_:sensor3CalWet:649370:
+  //println("textfield3 - GTextField >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && (event == GEvent.LOST_FOCUS || event == GEvent.ENTERED)) {
+    String cmd = "W,3," + source.getValueI();
+    arduinoPort.write(cmd);
+  }
+} //_CODE_:sensor3CalWet:649370:
+
+
+
 public void resetButton_clicked(GButton source, GEvent event) { //_CODE_:resetButton:668454:
-  println("resetButton - GButton >> GEvent." + event + " @ " + millis());
+  //println("resetButton - GButton >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.CLICKED) {
+    String cmd = "R";
+    arduinoPort.write(cmd);
+  }
 } //_CODE_:resetButton:668454:
-
-
 
 public void connectButton_clicked(GButton source, GEvent event) { 
   if (event == GEvent.CLICKED) {
