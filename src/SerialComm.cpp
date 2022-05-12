@@ -58,15 +58,59 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             sendConfig();
         } else if (cmd == 'E') { // Enable
             strtok(inStr.c_str(), ",");
-            char* sensorNr = strtok(NULL, ",");
-            char* value = strtok(NULL, "\n");
+            uint8_t sensorNr = atoi(strtok(NULL, ","));
+            uint8_t value = atoi(strtok(NULL, "\n"));
+            m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setEnable(value == 1);
+            sendConfig();
         } else if (cmd == 'L') { // Limit
+            strtok(inStr.c_str(), ",");
+            uint8_t sensorNr = atoi(strtok(NULL, ","));
+            uint8_t value = atoi(strtok(NULL, "\n"));
+            m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setHumidityLimit(value);
+            sendConfig();
         } else if (cmd == 'P') { // Pumptime
+            strtok(inStr.c_str(), ",");
+            uint8_t sensorNr = atoi(strtok(NULL, ","));
+            uint8_t value = atoi(strtok(NULL, "\n"));
+            m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setPumpTime(value);
+            sendConfig();
         } else if (cmd == 'M') { // Maxpumpings
+            strtok(inStr.c_str(), ",");
+            uint8_t sensorNr = atoi(strtok(NULL, ","));
+            uint8_t value = atoi(strtok(NULL, "\n"));
+            m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setMaxPumpings(value);
+            sendConfig();
         } else if (cmd == 'T') { // Pumptimeout
+            strtok(inStr.c_str(), ",");
+            uint8_t sensorNr = atoi(strtok(NULL, ","));
+            uint8_t value = atoi(strtok(NULL, "\n"));
+            m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setPumpTimeout(value);
+            sendConfig();
         } else if (cmd == 'D') { // Pumpdelay
+            strtok(inStr.c_str(), ",");
+            uint8_t sensorNr = atoi(strtok(NULL, ","));
+            uint8_t value = atoi(strtok(NULL, "\n"));
+            m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setPumpDelay(value);
+            sendConfig();
         } else if (cmd == 'K') { // CalDry
+            strtok(inStr.c_str(), ",");
+            uint8_t sensorNr = atoi(strtok(NULL, ","));
+            uint16_t value = atol(strtok(NULL, "\n"));
+            m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setCalDry(value);
+            sendConfig();
         } else if (cmd == 'W') { // CalWet
+            strtok(inStr.c_str(), ",");
+            uint8_t sensorNr = atoi(strtok(NULL, ","));
+            uint16_t value = atol(strtok(NULL, "\n"));
+            m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setCalWet(value);
+            sendConfig();
+        } else if (cmd == 'R') {
+            m_controller->GreenhouseConfiguration.Reset();
+            m_controller->GreenhouseConfiguration.Save();
+            sendConfig();
+        } else if (cmd == 'S') {
+            m_controller->GreenhouseConfiguration.Save();
+            sendConfig();
         }
     }
 }
