@@ -22,7 +22,7 @@
 
 GreenhouseController Greenhouse;
 Display ledDisplay;
-SerialComm serial;
+SerialComm serial { Greenhouse };
 
 // Setup eeprom, load config values, setup pins, init sensors, init display
 GreenhouseController::GreenhouseController()
@@ -136,7 +136,7 @@ void loop()
     Greenhouse.currentMillis = millis();
     if (serial.connected()) {
 
-        serial.serialLoop(Greenhouse.currentMillis, Greenhouse);
+        serial.serialLoop(Greenhouse.currentMillis);
     } else {
         serial.tryHandshake(Greenhouse.currentMillis);
         if (serial.connected())

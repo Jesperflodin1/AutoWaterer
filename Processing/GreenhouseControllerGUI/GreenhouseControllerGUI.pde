@@ -41,11 +41,12 @@ public void draw(){
     hideConnectPrompt();
     
     if (serialInput) {
-      if (!configDone && configBytes.length == 56) {
+      if (configBytes.length == 56) {
         println("Got config data with correct length");
         //String[] splitStr = configStr.split(",",0);
         
         humidityInterval.setValue(configBytes[1]);
+        println(configBytes[1]);
         
         sensor1Enable.setSelected(configBytes[3] == 1);
         sensor2Enable.setSelected(configBytes[3+17] == 1);
@@ -87,6 +88,7 @@ public void draw(){
 
         serialInput = false;
         configDone = true;
+        configBytes = new byte[0];
       } else if (sensorBytes != null) {
         String sensor1 = Integer.toString(((char) (sensorBytes[1] & 0xFF) << 8) | (sensorBytes[0] & 0xFF));
         String sensor2 = Integer.toString(((char) (sensorBytes[4] & 0xFF) << 8) | (sensorBytes[3] & 0xFF));
@@ -192,7 +194,7 @@ void serialEvent(Serial arduinoPort) {
     if ((char)inByte == 'Z') {
       arduinoPort.clear();   // clear the serial port buffer
       firstContact = true;  // you've had first contact from the microcontroller
-      arduinoPort.write('X');
+      arduinoPort.write("X,\n");
     } 
     if ((char)inByte == 'X') {
       prevMillisPing = millis(); //reset timeout timer
@@ -206,7 +208,7 @@ void serialEvent(Serial arduinoPort) {
     
     if (!configRequested && configBytes.length == 0) {
       println("Requesting complete config");
-      arduinoPort.write('C'); //Request complete config
+      arduinoPort.write("C,\n"); //Request complete config
       configRequested = true;
     }
     //Handle command
@@ -218,6 +220,8 @@ void serialEvent(Serial arduinoPort) {
     } else if ((char)inByte == 'S') {
       sensorBytes = arduinoPort.readBytes(12);
       serialInput = true;
+    } else {
+      println(arduinoPort.readStringUntil('\n'));
     }
     //inString = arduinoPort.readStringUntil('\n');
   }

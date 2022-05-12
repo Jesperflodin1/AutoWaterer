@@ -29,6 +29,15 @@ public:
         uint16_t calibrationDry;
         uint16_t calibrationWet;
 
+        void setEnable(bool en) { enable = en; }
+        void setHumidityLimit(uint8_t limit) { humidityLimit = limit; }
+        void setPumpTime(uint8_t time) { pumpTime = time; }
+        void setMaxPumpings(uint8_t pumpings) { maxPumpings = pumpings; }
+        void setPumpTimeout(uint8_t time) { pumpTimeout = time; }
+        void setPumpDelay(uint8_t delay) { pumpDelay = delay; }
+        void setCalDry(uint16_t cal) { calibrationDry = cal; }
+        void setCalWet(uint16_t cal) { calibrationWet = cal; }
+
         SensorConfiguration()
             : enable(CFG_SENSOR_ENABLE)
             , humidityLimit(CFG_SENSOR_LIMIT)
@@ -40,33 +49,46 @@ public:
             , calibrationWet(CFG_SENSOR_CALIBRATIONWET)
         {
         }
+        void Reset()
+        {
+            enable = CFG_SENSOR_ENABLE;
+            humidityLimit = CFG_SENSOR_LIMIT;
+            pumpTime = CFG_SENSOR_PUMPTIME;
+            maxPumpings = CFG_SENSOR_MAXPUMPINGS;
+            pumpTimeout = CFG_SENSOR_PUMPTIMEOUT;
+            pumpDelay = CFG_SENSOR_PUMPDELAY;
+            calibrationDry = CFG_SENSOR_CALIBRATIONDRY;
+            calibrationWet = CFG_SENSOR_CALIBRATIONWET;
+        }
     };
 
     // 10*NUM_SENSORS + 1 byte configuration struct (Default 10*3+1 = 31 byte)
     struct Configuration {
-        uint8_t humidityCheckInterval;
+        uint8_t humidityCheckInterval = CFG_HUMIDITYCHECKINTERVAL;
         struct SensorConfiguration Sensor[NUM_SENSORS];
 
         Configuration()
         {
-            humidityCheckInterval = CFG_HUMIDITYCHECKINTERVAL;
-            for (int i = 0; i < NUM_SENSORS; i++) {
+            // humidityCheckInterval = CFG_HUMIDITYCHECKINTERVAL;
+            /*for (int i = 0; i < NUM_SENSORS; i++) {
                 Sensor[i] = SensorConfiguration();
-            }
+            }*/
         }
 
         void Reset()
         {
+            humidityCheckInterval = CFG_HUMIDITYCHECKINTERVAL;
             for (int i = 0; i < NUM_SENSORS; i++) {
-                Sensor[i] = SensorConfiguration();
+                Sensor[i].Reset();
             }
         }
+        void sethumidityCheckInterval(uint8_t value) { humidityCheckInterval = value; }
     };
 
     GreenhouseControllerConfiguration();
 
-    SensorConfiguration getSensorConfig(uint8_t sensor) { return StoredConfiguration.Data.Sensor[sensor]; }
-    Configuration getGlobalConfig() { return StoredConfiguration.Data; };
+    SensorConfiguration& getSensorConfig(uint8_t sensor) { return StoredConfiguration.Data.Sensor[sensor]; }
+    Configuration& getGlobalConfig() { return StoredConfiguration.Data; };
 
     void Reset();
     void Save();

@@ -1,7 +1,8 @@
 #include "SerialComm.h"
 
-SerialComm::SerialComm()
+SerialComm::SerialComm(GreenhouseController& controller)
 {
+    m_controller = &controller;
 }
 
 void SerialComm::begin()
@@ -26,37 +27,59 @@ void SerialComm::tryHandshake(uint32_t currentMillis)
     }
 }
 
-void SerialComm::serialLoop(uint32_t currentMillis, GreenhouseController controller)
+void SerialComm::serialLoop(uint32_t currentMillis)
 {
     if (prevMillisPingDelayPassed(currentMillis)) {
         ping();
         // Send sensor readings
         byte sensorBytes[10];
-        controller.readSerializedSensors(sensorBytes, ',');
+        m_controller->readSerializedSensors(sensorBytes, ',');
         for (int i = 0; i < 10; i++)
             Serial.write(sensorBytes[i]); // CMD S
         Serial.println();
 
-        if (m_handshakeDone && prevMillisPingTimeoutPassed(currentMillis)) {
+        /*if (m_handshakeDone && prevMillisPingTimeoutPassed(currentMillis)) {
             // Tear down serial connection, wait for new
             m_handshakeDone = false;
-        }
+        }*/
     }
     if (Serial.available() > 0) {
         String inStr = Serial.readStringUntil('\n');
         char cmd = inStr.charAt(0);
+
         if (cmd == 'C') {
             // Send config
-            byte configBytes[55];
-            controller.GreenhouseConfiguration.serializedConfig(configBytes, ',');
-
-            // Serial.println(configBytes);
-            for (int i = 0; i < 55; i++)
-                Serial.write(configBytes[i]);
-            Serial.println();
-        } else if (cmd == 'Q') {
+            sendConfig();
+        } else if (cmd == 'H') { // humidityInterval
+            strtok(inStr.c_str(), ",");
+            char* value = strtok(NULL, "\n");
+            uint8_t val = atoi(value);
+            m_controller->GreenhouseConfiguration.getGlobalConfig().sethumidityCheckInterval(val);
+            sendConfig();
+        } else if (cmd == 'E') { // Enable
+            strtok(inStr.c_str(), ",");
+            char* sensorNr = strtok(NULL, ",");
+            char* value = strtok(NULL, "\n");
+        } else if (cmd == 'L') { // Limit
+        } else if (cmd == 'P') { // Pumptime
+        } else if (cmd == 'M') { // Maxpumpings
+        } else if (cmd == 'T') { // Pumptimeout
+        } else if (cmd == 'D') { // Pumpdelay
+        } else if (cmd == 'K') { // CalDry
+        } else if (cmd == 'W') { // CalWet
         }
     }
+}
+
+void SerialComm::sendConfig()
+{
+    byte configBytes[55];
+    m_controller->GreenhouseConfiguration.serializedConfig(configBytes, ',');
+
+    // Serial.println(configBytes);
+    for (int i = 0; i < 55; i++)
+        Serial.write(configBytes[i]);
+    Serial.println();
 }
 
 void SerialComm::ping()
