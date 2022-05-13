@@ -230,7 +230,31 @@ public void sensor3CalWet_changed(GTextField source, GEvent event) { //_CODE_:se
 public void resetButton_clicked(GButton source, GEvent event) { //_CODE_:resetButton:668454:
   //println("resetButton - GButton >> GEvent." + event + " @ " + millis());
   if (arduinoPort != null && arduinoPort.active() && event == GEvent.CLICKED) {
-    String cmd = "R";
+    String cmd = "R,";
+    arduinoPort.write(cmd + '\n');
+  }
+} //_CODE_:resetButton:668454:
+public void saveButton_clicked(GButton source, GEvent event) { //_CODE_:resetButton:668454:
+  //println("resetButton - GButton >> GEvent." + event + " @ " + millis());
+  if (arduinoPort != null && arduinoPort.active() && event == GEvent.CLICKED) {
+    String cmd = "M,1," + sensor1Maxpumpings.getValueI();
+    arduinoPort.write(cmd + '\n');
+    cmd = "M,2," + sensor2Maxpumpings.getValueI();
+    arduinoPort.write(cmd + '\n');
+    cmd = "M,3," + sensor3Maxpumpings.getValueI();
+    arduinoPort.write(cmd + '\n');
+    
+    cmd = "D,1," + sensor1Pumpdelay.getValueI();
+    arduinoPort.write(cmd + '\n');
+    cmd = "D,2," + sensor2Pumpdelay.getValueI();
+    arduinoPort.write(cmd + '\n');
+    cmd = "D,3," + sensor3Pumpdelay.getValueI();
+    arduinoPort.write(cmd + '\n');
+    
+    cmd = "H," + humidityInterval.getValueS();
+    arduinoPort.write(cmd + "\n");
+    
+    cmd = "S,";
     arduinoPort.write(cmd + '\n');
   }
 } //_CODE_:resetButton:668454:
@@ -475,9 +499,7 @@ public void createGUI(){
   sensor3CalDry.setPromptText("1-1024");
   sensor3CalDry.setOpaque(true);
   sensor3CalDry.addEventHandler(this, "sensor3CalDry_changed");
-  resetButton = new GButton(this, 600, 20, 160, 30);
-  resetButton.setText("Nollställ inställningar");
-  resetButton.addEventHandler(this, "resetButton_clicked");
+  
   sensor1Raw_label = new GLabel(this, 830, 200, 150, 30);
   sensor1Raw_label.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   sensor1Raw_label.setText("Aktuellt värde sensor 1");
@@ -503,6 +525,12 @@ public void createGUI(){
   sensor3Raw_label.setText("Aktuellt värde sensor 3");
   sensor3Raw_label.setOpaque(false);
   
+  resetButton = new GButton(this, 550, 20, 160, 30);
+  resetButton.setText("Nollställ inställningar");
+  resetButton.addEventHandler(this, "resetButton_clicked");
+  saveButton = new GButton(this, 750, 20, 140, 30);
+  saveButton.setText("Spara inställningar");
+  saveButton.addEventHandler(this, "saveButton_clicked");
   
   panelLoading = new GPanel(this, 225, 175, 500, 200, "Ansluter till arduino");
   panelLoading.setCollapsible(false);
@@ -570,3 +598,4 @@ GPanel panelLoading;
 GLabel loadingLabel; 
 GDropList serialList;
 GButton connectButton;
+GButton saveButton;

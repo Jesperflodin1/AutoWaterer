@@ -124,6 +124,16 @@ void SerialComm::sendConfig()
     for (int i = 0; i < 55; i++)
         Serial.write(configBytes[i]);
     Serial.println();
+
+    Serial.print(".");
+    Serial.print((uint16_t)&m_controller->GreenhouseConfiguration.StoredConfiguration.Data);
+    Serial.print(".");
+    Serial.print((uint16_t)sizeof(m_controller->GreenhouseConfiguration.StoredConfiguration.Data));
+    Serial.print(".");
+    Serial.print((uint16_t)&m_controller->GreenhouseConfiguration.StoredConfiguration.Data.Sensor);
+    Serial.print(".");
+    Serial.print((uint16_t)sizeof(m_controller->GreenhouseConfiguration.StoredConfiguration.Data.Sensor));
+    Serial.print(".");
 }
 
 void SerialComm::ping()

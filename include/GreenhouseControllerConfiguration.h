@@ -94,9 +94,9 @@ public:
     void Save();
 
     byte* serializedConfig(byte* emptyStr, char delimiter);
+    EEPROMStore<GreenhouseControllerConfiguration::Configuration> StoredConfiguration;
 
 private:
-    EEPROMStore<GreenhouseControllerConfiguration::Configuration> StoredConfiguration;
 };
 
 uint8_t SetupConfig(void);
