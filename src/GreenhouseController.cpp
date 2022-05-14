@@ -134,7 +134,8 @@ void setup()
 void loop()
 {
     Greenhouse.currentMillis = millis();
-    if (serial.connected()) {
+
+        if (serial.connected()) {
 
         serial.serialLoop(Greenhouse.currentMillis);
     } else {

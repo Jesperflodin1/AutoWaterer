@@ -1,9 +1,12 @@
 #include "GreenhouseControllerConfiguration.h"
 
+
+
+/*
 GreenhouseControllerConfiguration::GreenhouseControllerConfiguration()
 {
     StoredConfiguration = EEPROMStore<GreenhouseControllerConfiguration::Configuration> {};
-}
+}*/
 
 void GreenhouseControllerConfiguration::Reset()
 {

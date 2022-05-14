@@ -1,7 +1,7 @@
-#include "GreenhouseControllerConfiguration.h"
-#include "GreenhouseController.h"
-#include <HardwareSerial.h>
 #include <Arduino.h>
+
+class GreenhouseController;
+class GreenhouseControllerConfiguration;
 
 class SerialComm {
 private:

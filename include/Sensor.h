@@ -1,6 +1,8 @@
 #ifndef _SENSOR_H
 #define _SENSOR_H
-#include "GreenhouseControllerConfiguration.h"
+//#include "GreenhouseControllerConfiguration.h"
+
+class GreenhouseControllerConfiguration;
 
 class Sensor {
 private:

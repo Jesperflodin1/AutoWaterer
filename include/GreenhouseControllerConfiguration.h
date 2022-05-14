@@ -5,6 +5,8 @@
 #include <Arduino.h>
 
 /* --- Default configuration --- */
+#define CFG_VERSION 0xA1
+
 #define CFG_SENSOR_ENABLE 1
 #define CFG_SENSOR_LIMIT 90
 #define CFG_SENSOR_PUMPTIME 14 // Sec
@@ -19,7 +21,7 @@
 class GreenhouseControllerConfiguration {
 public:
     // 10 byte sensor configuration struct
-    struct SensorConfiguration {
+    struct __attribute__((packed)) SensorConfiguration {
         bool enable;
         uint8_t humidityLimit;
         uint8_t pumpTime; // Seconds
@@ -63,17 +65,9 @@ public:
     };
 
     // 10*NUM_SENSORS + 1 byte configuration struct (Default 10*3+1 = 31 byte)
-    struct Configuration {
+    struct __attribute__((packed)) Configuration {
         uint8_t humidityCheckInterval = CFG_HUMIDITYCHECKINTERVAL;
         struct SensorConfiguration Sensor[NUM_SENSORS];
-
-        Configuration()
-        {
-            // humidityCheckInterval = CFG_HUMIDITYCHECKINTERVAL;
-            /*for (int i = 0; i < NUM_SENSORS; i++) {
-                Sensor[i] = SensorConfiguration();
-            }*/
-        }
 
         void Reset()
         {
@@ -85,7 +79,7 @@ public:
         void sethumidityCheckInterval(uint8_t value) { humidityCheckInterval = value; }
     };
 
-    GreenhouseControllerConfiguration();
+    // GreenhouseControllerConfiguration();
 
     SensorConfiguration& getSensorConfig(uint8_t sensor) { return StoredConfiguration.Data.Sensor[sensor]; }
     Configuration& getGlobalConfig() { return StoredConfiguration.Data; };
@@ -94,9 +88,9 @@ public:
     void Save();
 
     byte* serializedConfig(byte* emptyStr, char delimiter);
-    EEPROMStore<GreenhouseControllerConfiguration::Configuration> StoredConfiguration;
 
 private:
+    EEPROMStore<GreenhouseControllerConfiguration::Configuration> StoredConfiguration;
 };
 
 uint8_t SetupConfig(void);

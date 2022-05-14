@@ -1,3 +1,6 @@
+#include <HardwareSerial.h>
+#include "GreenhouseControllerConfiguration.h"
+#include "GreenhouseController.h"
 #include "SerialComm.h"
 
 SerialComm::SerialComm(GreenhouseController& controller)
@@ -51,55 +54,55 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             // Send config
             sendConfig();
         } else if (cmd == 'H') { // humidityInterval
-            strtok(inStr.c_str(), ",");
+            strtok((char*)inStr.c_str(), ",");
             char* value = strtok(NULL, "\n");
             uint8_t val = atoi(value);
             m_controller->GreenhouseConfiguration.getGlobalConfig().sethumidityCheckInterval(val);
             sendConfig();
         } else if (cmd == 'E') { // Enable
-            strtok(inStr.c_str(), ",");
+            strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setEnable(value == 1);
             sendConfig();
         } else if (cmd == 'L') { // Limit
-            strtok(inStr.c_str(), ",");
+            strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setHumidityLimit(value);
             sendConfig();
         } else if (cmd == 'P') { // Pumptime
-            strtok(inStr.c_str(), ",");
+            strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setPumpTime(value);
             sendConfig();
         } else if (cmd == 'M') { // Maxpumpings
-            strtok(inStr.c_str(), ",");
+            strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setMaxPumpings(value);
             sendConfig();
         } else if (cmd == 'T') { // Pumptimeout
-            strtok(inStr.c_str(), ",");
+            strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setPumpTimeout(value);
             sendConfig();
         } else if (cmd == 'D') { // Pumpdelay
-            strtok(inStr.c_str(), ",");
+            strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setPumpDelay(value);
             sendConfig();
         } else if (cmd == 'K') { // CalDry
-            strtok(inStr.c_str(), ",");
+            strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint16_t value = atol(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setCalDry(value);
             sendConfig();
         } else if (cmd == 'W') { // CalWet
-            strtok(inStr.c_str(), ",");
+            strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint16_t value = atol(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setCalWet(value);
@@ -124,16 +127,6 @@ void SerialComm::sendConfig()
     for (int i = 0; i < 55; i++)
         Serial.write(configBytes[i]);
     Serial.println();
-
-    Serial.print(".");
-    Serial.print((uint16_t)&m_controller->GreenhouseConfiguration.StoredConfiguration.Data);
-    Serial.print(".");
-    Serial.print((uint16_t)sizeof(m_controller->GreenhouseConfiguration.StoredConfiguration.Data));
-    Serial.print(".");
-    Serial.print((uint16_t)&m_controller->GreenhouseConfiguration.StoredConfiguration.Data.Sensor);
-    Serial.print(".");
-    Serial.print((uint16_t)sizeof(m_controller->GreenhouseConfiguration.StoredConfiguration.Data.Sensor));
-    Serial.print(".");
 }
 
 void SerialComm::ping()
