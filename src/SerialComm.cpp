@@ -58,6 +58,11 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             char* value = strtok(NULL, "\n");
             uint8_t val = atoi(value);
             m_controller->GreenhouseConfiguration.getGlobalConfig().sethumidityCheckInterval(val);
+
+            Serial.print(".");
+            Serial.print("H=");
+            Serial.println(m_controller->GreenhouseConfiguration.getGlobalConfig().humidityCheckInterval);
+
             sendConfig();
         } else if (cmd == 'E') { // Enable
             strtok((char*)inStr.c_str(), ",");
@@ -82,6 +87,14 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setMaxPumpings(value);
+
+            Serial.print(".");
+            Serial.print("Sensor=");
+            Serial.print(sensorNr - 1);
+            Serial.print(".");
+            Serial.print("M=");
+            Serial.println(m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).maxPumpings);
+
             sendConfig();
         } else if (cmd == 'T') { // Pumptimeout
             strtok((char*)inStr.c_str(), ",");
@@ -94,6 +107,14 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setPumpDelay(value);
+
+            Serial.print(".");
+            Serial.print("Sensor=");
+            Serial.print(sensorNr - 1);
+            Serial.print(".");
+            Serial.print("D=");
+            Serial.println(m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).pumpDelay);
+
             sendConfig();
         } else if (cmd == 'K') { // CalDry
             strtok((char*)inStr.c_str(), ",");
@@ -112,7 +133,11 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             m_controller->GreenhouseConfiguration.Save();
             sendConfig();
         } else if (cmd == 'S') {
-            m_controller->GreenhouseConfiguration.Save();
+            bool success = m_controller->GreenhouseConfiguration.Save();
+
+            Serial.print(".SAVING=");
+            Serial.print(success);
+
             sendConfig();
         }
     }

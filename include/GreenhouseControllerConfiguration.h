@@ -85,7 +85,7 @@ public:
     Configuration& getGlobalConfig() { return StoredConfiguration.Data; };
 
     void Reset();
-    void Save();
+    bool Save();
 
     byte* serializedConfig(byte* emptyStr, char delimiter);
 

@@ -13,9 +13,9 @@ void GreenhouseControllerConfiguration::Reset()
     StoredConfiguration.Reset();
 }
 
-void GreenhouseControllerConfiguration::Save()
+bool GreenhouseControllerConfiguration::Save()
 {
-    StoredConfiguration.Save();
+    return StoredConfiguration.Save();
 }
 
 // needs a string of 55 chars

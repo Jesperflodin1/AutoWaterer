@@ -9,6 +9,7 @@ boolean firstContact = false;  // Whether we've heard from the microcontroller
 
 boolean serialInput = false;
 boolean connecting = false;
+boolean saving = false;
 
 boolean configDone = false;
 static boolean configRequested = true;
@@ -23,7 +24,6 @@ long prevMillisPing = 0;
 public void setup(){
   size(1050, 550, JAVA2D);
   createGUI();
-  customGUI();
   // Place your setup code here
   showConnectPrompt();
   
@@ -38,8 +38,6 @@ public void draw(){
   }
 
   if (firstContact) {
-    hideConnectPrompt();
-    
     if (serialInput) {
       if (configBytes.length == 56) {
         println("Got config data with correct length");
@@ -89,6 +87,8 @@ public void draw(){
         serialInput = false;
         configDone = true;
         configBytes = new byte[0];
+        saving = false;
+        hidePrompt();
       } else if (sensorBytes != null) {
         String sensor1 = Integer.toString(((char) (sensorBytes[1] & 0xFF) << 8) | (sensorBytes[0] & 0xFF));
         String sensor2 = Integer.toString(((char) (sensorBytes[4] & 0xFF) << 8) | (sensorBytes[3] & 0xFF));
@@ -111,41 +111,27 @@ public void draw(){
       println("SERIAL TIMEOUT");
       firstContact = false;
       arduinoPort.stop();
+      inString = "";
+
+      serialInput = false;
+      connecting = false;
+      saving = false;
+
+      configDone = false;
+      configRequested = true;
+      configBytes = new byte[0]; //Incoming config string
+
+      sensorBytes = new byte[0];
       showConnectPrompt();
     }
   }
 }
 
-// Use this method to add additional statements
-// to customise the GUI controls
-public void customGUI(){
-  //panelLoading.setVisible(false);
-  
-  
-  StyledString loadingString = new StyledString("Letar efter arduino...");
-  loadingString.addAttribute(TextAttribute.SIZE, 18);
-  loadingLabel.setStyledText(loadingString);
-  
-  sensor1Enable.getStyledText().addAttribute(TextAttribute.SIZE, 16);
-  sensor2Enable.getStyledText().addAttribute(TextAttribute.SIZE, 16);
-  sensor3Enable.getStyledText().addAttribute(TextAttribute.SIZE, 16);
-  
-  sensor1RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
-  sensor2RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
-  sensor3RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
-  
-  sensor1CalDry.setNumeric(0,1024,500);
-  sensor2CalDry.setNumeric(0,1024,500);
-  sensor3CalDry.setNumeric(0,1024,500);
-  sensor1CalWet.setNumeric(0,1024,500);
-  sensor2CalWet.setNumeric(0,1024,500);
-  sensor3CalWet.setNumeric(0,1024,500);
-
-}
 void showConnecting() {
   panelLoading.setVisible(true);
   serialList.setVisible(false);
   connectButton.setVisible(false);
+  savingLabel.setVisible(false);
   loadingLabel.setVisible(true);
 }
 void showConnectPrompt() {
@@ -153,18 +139,27 @@ void showConnectPrompt() {
   panelLoading.setVisible(true);
   serialList.setVisible(true);
   connectButton.setVisible(true);
+  savingLabel.setVisible(false);
   loadingLabel.setVisible(false);
 }
-void hideConnectPrompt() {
+void showSavingPrompt() {
+  panelLoading.setVisible(true);
+  serialList.setVisible(false);
+  connectButton.setVisible(false);
+  savingLabel.setVisible(true);
+  loadingLabel.setVisible(false);
+}
+void hidePrompt() {
   panelLoading.setVisible(false);
   serialList.setVisible(false);
   connectButton.setVisible(false);
+  savingLabel.setVisible(false);
   loadingLabel.setVisible(false);
 }
 
 public void connectSerial(String port) {
   arduinoPort = new Serial(this, port, 9600);
-  redraw();
+
   delay(2000);
   arduinoPort.write("   ");
   delay(2000);

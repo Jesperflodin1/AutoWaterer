@@ -232,6 +232,8 @@ public void resetButton_clicked(GButton source, GEvent event) { //_CODE_:resetBu
   if (arduinoPort != null && arduinoPort.active() && event == GEvent.CLICKED) {
     String cmd = "R,";
     arduinoPort.write(cmd + '\n');
+    saving = true;
+    showSavingPrompt();
   }
 } //_CODE_:resetButton:668454:
 public void saveButton_clicked(GButton source, GEvent event) { //_CODE_:resetButton:668454:
@@ -256,11 +258,14 @@ public void saveButton_clicked(GButton source, GEvent event) { //_CODE_:resetBut
     
     cmd = "S,";
     arduinoPort.write(cmd + '\n');
+    saving = true;
+    showSavingPrompt();
   }
 } //_CODE_:resetButton:668454:
 
 public void connectButton_clicked(GButton source, GEvent event) { 
   if (event == GEvent.CLICKED) {
+    showConnecting();
     connectSerial(serialList.getSelectedText());
   }
 } 
@@ -539,8 +544,11 @@ public void createGUI(){
   panelLoading.setOpaque(true);
   loadingLabel = new GLabel(this, 150, 75, 200, 50);
   loadingLabel.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
-  loadingLabel.setText("Letar efter arduino...");
+  loadingLabel.setText("Letar efter Arduino Uno...");
   loadingLabel.setOpaque(false);
+  StyledString loadingString = new StyledString("Letar efter Arduino Uno...");
+  loadingString.addAttribute(TextAttribute.SIZE, 18);
+  loadingLabel.setStyledText(loadingString);
   loadingLabel.setVisible(false);
   panelLoading.addControl(loadingLabel);
   serialList = new GDropList(this, 120, 80, 250, 80);
@@ -550,6 +558,31 @@ public void createGUI(){
   connectButton.setText("Anslut");
   connectButton.addEventHandler(this, "connectButton_clicked");
   panelLoading.addControl(connectButton);
+  
+  savingLabel = new GLabel(this, 150, 75, 200, 50);
+  savingLabel.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  savingLabel.setText("Sparar inställningar till arduino...");
+  savingLabel.setOpaque(false);
+  StyledString savingString = new StyledString("Sparar inställningar till arduino...");
+  savingString.addAttribute(TextAttribute.SIZE, 18);
+  savingLabel.setStyledText(savingString);
+  savingLabel.setVisible(false);
+  panelLoading.addControl(savingLabel);
+  
+  sensor1Enable.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+  sensor2Enable.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+  sensor3Enable.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+  
+  sensor1RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+  sensor2RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+  sensor3RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+  
+  sensor1CalDry.setNumeric(0,1024,500);
+  sensor2CalDry.setNumeric(0,1024,500);
+  sensor3CalDry.setNumeric(0,1024,500);
+  sensor1CalWet.setNumeric(0,1024,500);
+  sensor2CalWet.setNumeric(0,1024,500);
+  sensor3CalWet.setNumeric(0,1024,500);
 }
 
 // Variable declarations 
@@ -596,6 +629,7 @@ GLabel sensor3RawValue;
 GLabel sensor3Raw_label; 
 GPanel panelLoading; 
 GLabel loadingLabel; 
+GLabel savingLabel;
 GDropList serialList;
 GButton connectButton;
 GButton saveButton;
