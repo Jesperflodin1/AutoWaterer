@@ -23,10 +23,7 @@ void SerialComm::tryHandshake(uint32_t currentMillis)
             m_handshakeDone = true;
         }
     } else if (prevMillisPingDelayPassed(currentMillis)) {
-        if (Serial.available() <= 0) {
-
-            ping();
-        }
+        ping();
     }
 }
 
@@ -36,6 +33,7 @@ void SerialComm::serialLoop(uint32_t currentMillis)
         ping();
         // Send sensor readings
         byte sensorBytes[10];
+        m_controller->GreenhouseConfiguration.Reset();
         m_controller->readSerializedSensors(sensorBytes, ',');
         for (int i = 0; i < 10; i++)
             Serial.write(sensorBytes[i]); // CMD S
@@ -59,8 +57,8 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             uint8_t val = atoi(value);
             m_controller->GreenhouseConfiguration.getGlobalConfig().sethumidityCheckInterval(val);
 
-            Serial.print(".");
-            Serial.print("H=");
+            Serial.print(F("."));
+            Serial.print(F("H="));
             Serial.println(m_controller->GreenhouseConfiguration.getGlobalConfig().humidityCheckInterval);
 
             sendConfig();
@@ -88,11 +86,11 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setMaxPumpings(value);
 
-            Serial.print(".");
-            Serial.print("Sensor=");
+            Serial.print(F("."));
+            Serial.print(F("Sensor="));
             Serial.print(sensorNr - 1);
-            Serial.print(".");
-            Serial.print("M=");
+            Serial.print(F("."));
+            Serial.print(F("M="));
             Serial.println(m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).maxPumpings);
 
             sendConfig();
@@ -108,11 +106,11 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             uint8_t value = atoi(strtok(NULL, "\n"));
             m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).setPumpDelay(value);
 
-            Serial.print(".");
-            Serial.print("Sensor=");
+            Serial.print(F("."));
+            Serial.print(F("Sensor="));
             Serial.print(sensorNr - 1);
-            Serial.print(".");
-            Serial.print("D=");
+            Serial.print(F("."));
+            Serial.print(F("D="));
             Serial.println(m_controller->GreenhouseConfiguration.getSensorConfig(sensorNr - 1).pumpDelay);
 
             sendConfig();
@@ -135,8 +133,8 @@ void SerialComm::serialLoop(uint32_t currentMillis)
         } else if (cmd == 'S') {
             bool success = m_controller->GreenhouseConfiguration.Save();
 
-            Serial.print(".SAVING=");
-            Serial.print(success);
+            Serial.print(F(".SAVING="));
+            Serial.println(success);
 
             sendConfig();
         }
@@ -157,9 +155,9 @@ void SerialComm::sendConfig()
 void SerialComm::ping()
 {
     if (m_handshakeDone)
-        Serial.println("X");
+        Serial.println(F("X"));
     else
-        Serial.println("Z");
+        Serial.println(F("Z"));
 }
 
 bool SerialComm::prevMillisPingDelayPassed(uint32_t currentMillis)

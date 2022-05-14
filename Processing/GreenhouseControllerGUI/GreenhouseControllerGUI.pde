@@ -20,9 +20,12 @@ byte[] sensorBytes = new byte[0];
 int pingInterval = 2000;
 long prevMillisPing = 0;
 
+short connectStage = 0;
 
 public void setup(){
+  frameRate(20);
   size(1050, 550, JAVA2D);
+  pixelDensity(displayDensity());
   createGUI();
   // Place your setup code here
   showConnectPrompt();
@@ -30,13 +33,9 @@ public void setup(){
 }
 
 public void draw(){
-  background(230);
+  background(245);
+  long currentMillis = millis();
   
-  if (connecting) {
-    showConnecting();
-    connecting = false;
-  }
-
   if (firstContact) {
     if (serialInput) {
       if (configBytes.length == 56) {
@@ -44,7 +43,7 @@ public void draw(){
         //String[] splitStr = configStr.split(",",0);
         
         humidityInterval.setValue(configBytes[1]);
-        println(configBytes[1]);
+        //println(configBytes[1]);
         
         sensor1Enable.setSelected(configBytes[3] == 1);
         sensor2Enable.setSelected(configBytes[3+17] == 1);
@@ -87,8 +86,14 @@ public void draw(){
         serialInput = false;
         configDone = true;
         configBytes = new byte[0];
-        saving = false;
-        hidePrompt();
+        if (saving) {
+          saving = false;
+          hidePrompt();
+        }
+        if (connecting) {
+          connecting = false; 
+          hidePrompt();
+        }
       } else if (sensorBytes != null) {
         String sensor1 = Integer.toString(((char) (sensorBytes[1] & 0xFF) << 8) | (sensorBytes[0] & 0xFF));
         String sensor2 = Integer.toString(((char) (sensorBytes[4] & 0xFF) << 8) | (sensorBytes[3] & 0xFF));
@@ -105,24 +110,42 @@ public void draw(){
         sensorBytes = null;
       }
     } 
-    long currentMillis = millis();
-    if (currentMillis - prevMillisPing >= pingInterval*10) {
+    
+    if (currentMillis - prevMillisPing >= pingInterval*5) {
       //ping();
       println("SERIAL TIMEOUT");
-      firstContact = false;
-      arduinoPort.stop();
-      inString = "";
-
-      serialInput = false;
-      connecting = false;
-      saving = false;
-
-      configDone = false;
-      configRequested = true;
-      configBytes = new byte[0]; //Incoming config string
-
-      sensorBytes = new byte[0];
-      showConnectPrompt();
+      G4P.showMessage(this, "Anslutning avbruten. Försök ansluta igen.", "Avbrott i anslutning", G4P.ERROR_MESSAGE);
+      reset();
+    }
+  }
+  if (connecting && (currentMillis - prevMillisPing >= pingInterval+300)) {
+      
+    if (arduinoPort != null) {
+      println("Connecting with arduinoport=null? Should never get here.");
+      reset();  
+    }
+    try {
+      if (connectStage == 0) {
+        arduinoPort.clear(); 
+        arduinoPort.write("   ");
+        arduinoPort.clear(); 
+        connectStage = 1;
+        prevMillisPing = millis();
+        println("connectstage 1 done");
+      } else if (connectStage == 1) {
+        arduinoPort.bufferUntil('\n');
+        connectStage = 2;
+        prevMillisPing = millis();
+        println("connectstage 2 done");
+      } else if (currentMillis - prevMillisPing >= pingInterval*7) {
+        println("SERIAL TIMEOUT WHEN CONNECTING!");
+        G4P.showMessage(this, "Anslutningen tog för lång tid. Försök ansluta igen.", "Anslutningen avbruten", G4P.ERROR_MESSAGE);
+        reset();
+      }
+    } catch (Exception e) {
+      println("Failed to open serial port");
+      e.printStackTrace();
+      G4P.showMessage(this, "Anslutning misslyckades. Valde du rätt port? Försök igen.", "Anslutning misslyckades", G4P.ERROR_MESSAGE);
     }
   }
 }
@@ -156,18 +179,36 @@ void hidePrompt() {
   savingLabel.setVisible(false);
   loadingLabel.setVisible(false);
 }
+void reset() {
+  firstContact = false;
+  arduinoPort.stop();
+  inString = null;
+
+  serialInput = false;
+  connecting = false;
+  saving = false;
+
+  configDone = false;
+  configRequested = true;
+  configBytes = new byte[0]; //Incoming config string
+
+  sensorBytes = new byte[0];
+  connectStage = 0;
+  showConnectPrompt(); 
+}
 
 public void connectSerial(String port) {
-  arduinoPort = new Serial(this, port, 9600);
+  try {
+    arduinoPort = new Serial(this, port, 9600);
+  } catch (Exception e) {
+    println("Failed to open serial port");
+    e.printStackTrace();
+    G4P.showMessage(this, "Anslutning misslyckades. Valde du rätt port? Försök igen.", "Anslutning misslyckades", G4P.ERROR_MESSAGE);
+    return;
+  }
 
-  delay(2000);
-  arduinoPort.write("   ");
-  delay(2000);
   prevMillisPing = millis();
-  
-  arduinoPort.bufferUntil('\n');
-  configRequested = false;
-  
+  connecting = true;
 }
 
 void ping() {
@@ -179,50 +220,48 @@ void ping() {
 }
 
 void serialEvent(Serial arduinoPort) {
-  // read a byte from the serial port:
-  int inByte = arduinoPort.read();
-  // if this is the first byte received, and it's an A,
-  // clear the serial buffer and note that you've
-  // had first contact from the microcontroller.
-  // Otherwise, add the incoming byte to the array:
-  
+  try {
+    // read a byte from the serial port:
+    int inByte = arduinoPort.read();
+    
     if ((char)inByte == 'Z') {
       arduinoPort.clear();   // clear the serial port buffer
       firstContact = true;  // you've had first contact from the microcontroller
+      arduinoPort.readStringUntil('\n');
       arduinoPort.write("X,\n");
     } 
     if ((char)inByte == 'X') {
+      arduinoPort.readStringUntil('\n');
       prevMillisPing = millis(); //reset timeout timer
-      arduinoPort.clear();   // clear the serial port buffer
       if (!firstContact) {
         firstContact = true;  // you've had first contact from the microcontroller
         configRequested = false;
       }
     }
-  if (firstContact) {
-    
-    if (!configRequested && configBytes.length == 0) {
-      println("Requesting complete config");
-      arduinoPort.write("C,\n"); //Request complete config
-      configRequested = true;
+    if (firstContact) {
+      
+      if (!configRequested && configBytes.length == 0) {
+        println("Requesting complete config");
+        arduinoPort.write("C,\n"); //Request complete config
+        configRequested = true;
+      }
+      //Handle command
+      if ((char)inByte == 'C') {
+        println("Got config cmd");
+        //configStr = arduinoPort.readStringUntil('\n');
+        configBytes = arduinoPort.readBytes(57);
+        serialInput = true;
+      } else if ((char)inByte == 'S') {
+        sensorBytes = arduinoPort.readBytes(12);
+        serialInput = true;
+      } else if ((char)inByte != 'X') {
+        println(arduinoPort.readStringUntil('\n'));
+      } else {
+        arduinoPort.readStringUntil('\n');
+      }
     }
-    //Handle command
-    if ((char)inByte == 'C') {
-      println("Got config cmd");
-      //configStr = arduinoPort.readStringUntil('\n');
-      configBytes = arduinoPort.readBytes(57);
-      serialInput = true;
-    } else if ((char)inByte == 'S') {
-      sensorBytes = arduinoPort.readBytes(12);
-      serialInput = true;
-    } else {
-      println(arduinoPort.readStringUntil('\n'));
-    }
-    //inString = arduinoPort.readStringUntil('\n');
+  } catch (Exception e) {
+    e.printStackTrace();
+    G4P.showMessage(this, "Fel uppstod i anslutningen till Arduino Uno. Försök ansluta igen.", "Fel i anslutningen", G4P.ERROR_MESSAGE);
   }
-
-  
-  
 }
-
-//StyledString test;
