@@ -24,27 +24,15 @@ GreenhouseController Greenhouse;
 Display ledDisplay;
 SerialComm serial { Greenhouse };
 
-// Setup eeprom, load config values, setup pins, init sensors, init display
-GreenhouseController::GreenhouseController()
+void GreenhouseController::begin()
 {
-    GreenhouseConfiguration = GreenhouseControllerConfiguration();
-
     for (int i = 0; i < NUM_SENSORS; i++) {
         pinMode(HUMIDITYPOWER[i], OUTPUT);
         pinMode(HUMIDITYSENS[i], INPUT);
         pinMode(RELAY[i], OUTPUT);
     }
-
     ledDisplay.begin();
     ledDisplay.showBoot();
-    lastUpdatedSensor = NUM_SENSORS - 1;
-}
-
-void GreenhouseController::setupSensors()
-{
-    for (int i = 0; i < NUM_SENSORS; i++) {
-        Sensors[i] = Sensor(i, GreenhouseConfiguration);
-    }
 }
 
 void GreenhouseController::readSensors()
@@ -108,24 +96,9 @@ void GreenhouseController::handleSensor(uint8_t sensor)
     }
 }
 
-// "heartbeat" function, called periodically while connected
-/*void CustomHeartbeatCode () {
-// Do while connected?
-  static uint8_t curSensor = 0;
-  readHumidity(curSensor);
-  updateDisplay(curSensor, Sensors[curSensor].humidity);
-  if (curSensor == NUM_SENSORS-1)
-    curSensor = 0;
-  else
-    curSensor++;
-} */
-
 /* **** standard setup() function **** */
 void setup()
 {
-
-    Greenhouse = GreenhouseController();
-    Greenhouse.setupSensors();
     serial.begin();
 
     Greenhouse.readSensors();

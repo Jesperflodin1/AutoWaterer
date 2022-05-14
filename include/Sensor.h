@@ -2,6 +2,7 @@
 #define _SENSOR_H
 //#include "GreenhouseControllerConfiguration.h"
 
+class GreenhouseController;
 class GreenhouseControllerConfiguration;
 
 class Sensor {

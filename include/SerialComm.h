@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
 class GreenhouseController;
-class GreenhouseControllerConfiguration;
 
 class SerialComm {
 private:
@@ -9,7 +8,7 @@ private:
     const uint16_t m_pingInterval = 2000;
 
     bool m_handshakeDone = false;
-    GreenhouseController* m_controller;
+    GreenhouseController* m_Controller;
 
     void ping();
     void sendConfig();
