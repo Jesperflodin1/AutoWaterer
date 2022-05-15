@@ -9,11 +9,11 @@
 class GreenhouseController {
 
 private:
-    GreenhouseControllerConfiguration GreenhouseConfiguration {};
-    Sensor Sensors[NUM_SENSORS] = { { 0, GreenhouseConfiguration }, { 1, GreenhouseConfiguration }, { 2, GreenhouseConfiguration } };
-    uint8_t lastUpdatedSensor { NUM_SENSORS - 1 };
+    Sensor m_Sensors[NUM_SENSORS] = { { 0, m_GreenhouseConfiguration }, { 1, m_GreenhouseConfiguration }, { 2, m_GreenhouseConfiguration } };
+    uint8_t m_lastUpdatedSensor { NUM_SENSORS - 1 };
 
 public:
+    GreenhouseControllerConfiguration m_GreenhouseConfiguration;
     unsigned long currentMillis = 0; // stores the value of millis() in each iteration of loop()
 
     void begin();
@@ -24,11 +24,9 @@ public:
 
     void handleSensor(uint8_t);
 
-    Sensor& getSensor(uint8_t sensor) { return Sensors[sensor]; }
+    Sensor& getSensor(uint8_t sensor) { return m_Sensors[sensor]; }
 
-    GreenhouseControllerConfiguration& getConfigurationController() { return GreenhouseConfiguration; }
-    GreenhouseControllerConfiguration::Configuration& getConfiguration() { return getConfigurationController().getGlobalConfig(); }
-    GreenhouseControllerConfiguration::SensorConfiguration& getSensorConfiguration(uint8_t sensor) { return getConfigurationController().getSensorConfig(sensor); }
+    GreenhouseControllerConfiguration& getConfigurationController() { return m_GreenhouseConfiguration; }
 };
 
 #endif

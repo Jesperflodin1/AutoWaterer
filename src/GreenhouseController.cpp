@@ -30,16 +30,18 @@ void GreenhouseController::begin()
         pinMode(HUMIDITYPOWER[i], OUTPUT);
         pinMode(HUMIDITYSENS[i], INPUT);
         pinMode(RELAY[i], OUTPUT);
+        m_Sensors[i] = Sensor(i, m_GreenhouseConfiguration);
     }
     ledDisplay.begin();
     ledDisplay.showBoot();
+    m_GreenhouseConfiguration = GreenhouseControllerConfiguration();
 }
 
 void GreenhouseController::readSensors()
 {
     for (int i = 0; i < NUM_SENSORS; i++) {
-        if (Sensors[i].enabled() == true) { // If current sensor is enabled
-            Sensors[i].readHumidity();
+        if (m_Sensors[i].enabled() == true) { // If current sensor is enabled
+            m_Sensors[i].readHumidity();
         }
     }
 }
@@ -48,9 +50,9 @@ byte* GreenhouseController::readSerializedSensors(byte* emptyBytes, char delimit
 {
     emptyBytes[0] = 'S';
     for (int i = 0; i < NUM_SENSORS; i++) {
-        Sensors[i].readHumidity();
-        emptyBytes[1 + 3 * i] = Sensors[i].getRawHumidity() & 0xFF;
-        emptyBytes[2 + 3 * i] = Sensors[i].getRawHumidity() >> 8;
+        m_Sensors[i].readHumidity();
+        emptyBytes[1 + 3 * i] = m_Sensors[i].getRawHumidity() & 0xFF;
+        emptyBytes[2 + 3 * i] = m_Sensors[i].getRawHumidity() >> 8;
         emptyBytes[3 + 3 * i] = delimiter;
     }
     return emptyBytes;
@@ -58,39 +60,39 @@ byte* GreenhouseController::readSerializedSensors(byte* emptyBytes, char delimit
 
 void GreenhouseController::handleSensor(uint8_t sensor)
 {
-    if (Sensors[sensor].enabled() == true) { // If current sensor is enabled
-        if (Sensors[sensor].intervalTimePassed(currentMillis, true)) {
-            Sensors[sensor].readHumidity();
+    if (m_Sensors[sensor].enabled() == true) { // If current sensor is enabled
+        if (m_Sensors[sensor].intervalTimePassed(currentMillis, true)) {
+            m_Sensors[sensor].readHumidity();
 
             // Serial.print(F("Sensor "));
-            // Serial.println(Sensors[sensor].getID());
+            // Serial.println(m_Sensors[sensor].getID());
 
             // Serial.print(F("prevMillisPump: "));
-            // Serial.println(Sensors[sensor].getPrevMillisPump());
+            // Serial.println(m_Sensors[sensor].getPrevMillisPump());
 
-            if (Sensors[sensor].pumpDelayPassed(currentMillis)) {
+            if (m_Sensors[sensor].pumpDelayPassed(currentMillis)) {
                 // Serial.println(F("Reset nPump"));
-                Sensors[sensor]
+                m_Sensors[sensor]
                     .resetPumpings();
             }
 
             // Serial.print(F("getPumpings: "));
-            // Serial.println(Sensors[sensor].getPumpings());
+            // Serial.println(m_Sensors[sensor].getPumpings());
 
             // Maxtime elapsed or humidity low
-            if (Sensors[sensor].pumpTimeoutPassed(currentMillis, false) || (Sensors[sensor].lowHumidity() && Sensors[sensor].getPumpings() < 2)) {
+            if (m_Sensors[sensor].pumpTimeoutPassed(currentMillis, false) || (m_Sensors[sensor].lowHumidity() && m_Sensors[sensor].getPumpings() < 2)) {
                 // Serial.println(F("Pump triggered"));
-                Sensors[sensor].setPrevMillisPump(currentMillis);
+                m_Sensors[sensor].setPrevMillisPump(currentMillis);
                 ledDisplay.showPump(sensor);
-                Sensors[sensor].pump();
+                m_Sensors[sensor].pump();
             }
         }
 
-        if (sensor == (lastUpdatedSensor == NUM_SENSORS - 1 ? 0 : lastUpdatedSensor + 1)) {
+        if (sensor == (m_lastUpdatedSensor == NUM_SENSORS - 1 ? 0 : m_lastUpdatedSensor + 1)) {
             if (ledDisplay.intervalTimePassed()) {
-                lastUpdatedSensor = lastUpdatedSensor == NUM_SENSORS - 1 ? 0 : lastUpdatedSensor + 1;
+                m_lastUpdatedSensor = m_lastUpdatedSensor == NUM_SENSORS - 1 ? 0 : m_lastUpdatedSensor + 1;
 
-                ledDisplay.updateDisplay(sensor, Sensors[sensor].getHumidity());
+                ledDisplay.updateDisplay(sensor, m_Sensors[sensor].getHumidity());
             }
         }
     }
@@ -99,9 +101,13 @@ void GreenhouseController::handleSensor(uint8_t sensor)
 /* **** standard setup() function **** */
 void setup()
 {
+    Greenhouse = GreenhouseController();
+    Greenhouse.begin();
     serial.begin();
 
     Greenhouse.readSensors();
+    Serial.println((long)&Greenhouse, HEX);
+    Serial.println((long)Greenhouse.getSensor(0).m_Configuration, HEX);
 }
 
 void loop()

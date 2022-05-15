@@ -33,7 +33,15 @@ void SerialComm::serialLoop(uint32_t currentMillis)
         ping();
         // Send sensor readings
         byte sensorBytes[10];
-        m_Controller->getConfiguration().Reset();
+        /*Serial.println((long)&m_Controller->m_GreenhouseConfiguration, HEX);
+        Serial.println((long)&m_Controller->getConfigurationController(), HEX);
+        Serial.println((long)m_Controller, HEX);
+        Serial.println((long)&m_Controller->m_GreenhouseConfiguration.StoredConfiguration, HEX);
+        Serial.println((long)&m_Controller->m_GreenhouseConfiguration.StoredConfiguration.Data, HEX);
+        Serial.println((long)&m_Controller->m_GreenhouseConfiguration.StoredConfiguration.Data.humidityCheckInterval, HEX);
+        Serial.println((long)m_Controller->m_GreenhouseConfiguration.getHumidityCheckInterval(), HEX);*/
+        m_Controller->getConfigurationController().Reset();
+        // Serial.println((long)m_Controller, HEX);
         m_Controller->readSerializedSensors(sensorBytes, ',');
         for (int i = 0; i < 10; i++)
             Serial.write(sensorBytes[i]); // CMD S
@@ -55,76 +63,82 @@ void SerialComm::serialLoop(uint32_t currentMillis)
             strtok((char*)inStr.c_str(), ",");
             char* value = strtok(NULL, "\n");
             uint8_t val = atoi(value);
-            m_Controller->getConfiguration().sethumidityCheckInterval(val);
+            m_Controller->getConfigurationController().setHumidityCheckInterval(val);
 
             Serial.print(F("."));
             Serial.print(F("H="));
-            Serial.println(m_Controller->getConfiguration().humidityCheckInterval);
+            Serial.println(m_Controller->getConfigurationController().getHumidityCheckInterval());
 
             sendConfig();
         } else if (cmd == 'E') { // Enable
             strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
-            m_Controller->getSensorConfiguration(sensorNr - 1).setEnable(value == 1);
+            m_Controller->getConfigurationController().setEnabled(sensorNr - 1, value == 1);
             sendConfig();
         } else if (cmd == 'L') { // Limit
             strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
-            m_Controller->getSensorConfiguration(sensorNr - 1).setHumidityLimit(value);
+            m_Controller->getConfigurationController().setHumidityLimit(sensorNr - 1, value);
             sendConfig();
         } else if (cmd == 'P') { // Pumptime
             strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
-            m_Controller->getSensorConfiguration(sensorNr - 1).setPumpTime(value);
+            m_Controller->getConfigurationController().setPumpTime(sensorNr - 1, value);
             sendConfig();
         } else if (cmd == 'M') { // Maxpumpings
             strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
-            m_Controller->getSensorConfiguration(sensorNr - 1).setMaxPumpings(value);
+            m_Controller->getConfigurationController().setMaxPumpings(sensorNr - 1, value);
 
             Serial.print(F("."));
             Serial.print(F("Sensor="));
             Serial.print(sensorNr - 1);
             Serial.print(F("."));
             Serial.print(F("M="));
-            Serial.println(m_Controller->getSensorConfiguration(sensorNr - 1).maxPumpings);
+            Serial.print(m_Controller->getConfigurationController().getMaxPumpings(sensorNr - 1));
+            Serial.print(F("."));
+            Serial.print(F("D="));
+            Serial.println(m_Controller->getConfigurationController().getPumpDelay(sensorNr - 1));
 
             sendConfig();
         } else if (cmd == 'T') { // Pumptimeout
             strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
-            m_Controller->getSensorConfiguration(sensorNr - 1).setPumpTimeout(value);
+            m_Controller->getConfigurationController().setPumpTimeout(sensorNr - 1, value);
             sendConfig();
         } else if (cmd == 'D') { // Pumpdelay
             strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint8_t value = atoi(strtok(NULL, "\n"));
-            m_Controller->getSensorConfiguration(sensorNr - 1).setPumpDelay(value);
+            m_Controller->getConfigurationController().setPumpDelay(sensorNr - 1, value);
 
             Serial.print(F("."));
             Serial.print(F("Sensor="));
             Serial.print(sensorNr - 1);
             Serial.print(F("."));
+            Serial.print(F("M="));
+            Serial.print(m_Controller->getConfigurationController().getMaxPumpings(sensorNr - 1));
+            Serial.print(F("."));
             Serial.print(F("D="));
-            Serial.println(m_Controller->getSensorConfiguration(sensorNr - 1).pumpDelay);
+            Serial.println(m_Controller->getConfigurationController().getPumpDelay(sensorNr - 1));
 
             sendConfig();
         } else if (cmd == 'K') { // CalDry
             strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint16_t value = atol(strtok(NULL, "\n"));
-            m_Controller->getSensorConfiguration(sensorNr - 1).setCalDry(value);
+            m_Controller->getConfigurationController().setCalDry(sensorNr - 1, value);
             sendConfig();
         } else if (cmd == 'W') { // CalWet
             strtok((char*)inStr.c_str(), ",");
             uint8_t sensorNr = atoi(strtok(NULL, ","));
             uint16_t value = atol(strtok(NULL, "\n"));
-            m_Controller->getSensorConfiguration(sensorNr - 1).setCalWet(value);
+            m_Controller->getConfigurationController().setCalWet(sensorNr - 1, value);
             sendConfig();
         } else if (cmd == 'R') {
             m_Controller->getConfigurationController().Reset();

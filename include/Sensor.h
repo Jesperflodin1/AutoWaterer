@@ -16,9 +16,8 @@ private:
     unsigned long m_prevMillisPump { 0 };
     unsigned long m_prevMillisHumidityCheck { 0 }; // time of previous humidity check
 
-    GreenhouseControllerConfiguration* m_Configuration;
-
 public:
+    GreenhouseControllerConfiguration* m_Configuration;
     Sensor(uint8_t m_sensorId, GreenhouseControllerConfiguration& config);
 
     // Check if interval in minutes has passed for this sensor
