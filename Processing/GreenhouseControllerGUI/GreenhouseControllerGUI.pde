@@ -10,6 +10,7 @@ boolean firstContact = false;  // Whether we've heard from the microcontroller
 boolean serialInput = false;
 boolean connecting = false;
 boolean saving = false;
+boolean sendingSave = false;
 
 boolean configDone = false;
 boolean configRequested = true;
@@ -37,6 +38,10 @@ public void draw(){
   long currentMillis = millis();
   
   if (firstContact) {
+    if (sendingSave) {
+      sendSaveCmd();
+      sendingSave = false;
+    }
     if (serialInput) {
       if (configBytes != null && configBytes.length == 56) {
         println("Got config data with correct length");
@@ -227,6 +232,57 @@ void handleSensorCommand() {
   sensor1RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
   sensor2RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
   sensor3RawValue.getStyledText().addAttribute(TextAttribute.SIZE, 16);
+}
+
+void sendSaveCmd() {
+  saving = true;
+  
+  String cmd = "M,1," + sensor1Maxpumpings.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  cmd = "M,2," + sensor2Maxpumpings.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  cmd = "M,3," + sensor3Maxpumpings.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  
+  cmd = "D,1," + sensor1Pumpdelay.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  cmd = "D,2," + sensor2Pumpdelay.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  cmd = "D,3," + sensor3Pumpdelay.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  
+  cmd = "H," + humidityInterval.getValueS();
+  arduinoPort.write(cmd + "\n");
+  delay(100);
+  
+  cmd = "K,1," + sensor1CalDry.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  cmd = "K,2," + sensor2CalDry.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  cmd = "K,3," + sensor3CalDry.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  
+  cmd = "W,1," + sensor1CalWet.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  cmd = "W,2," + sensor2CalWet.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  cmd = "W,3," + sensor3CalWet.getValueI();
+  arduinoPort.write(cmd + '\n');
+  delay(100);
+  
+  cmd = "S,";
+  arduinoPort.write(cmd + '\n'); 
 }
 
 void resetConnectionState() {

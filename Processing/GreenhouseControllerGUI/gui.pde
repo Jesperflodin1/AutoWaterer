@@ -239,41 +239,9 @@ public void resetButton_clicked(GButton source, GEvent event) { //_CODE_:resetBu
 public void saveButton_clicked(GButton source, GEvent event) { //_CODE_:resetButton:668454:
   //println("resetButton - GButton >> GEvent." + event + " @ " + millis());
   if (arduinoPort != null && arduinoPort.active() && event == GEvent.CLICKED) {
-    String cmd = "M,1," + sensor1Maxpumpings.getValueI();
-    arduinoPort.write(cmd + '\n');
-    cmd = "M,2," + sensor2Maxpumpings.getValueI();
-    arduinoPort.write(cmd + '\n');
-    cmd = "M,3," + sensor3Maxpumpings.getValueI();
-    arduinoPort.write(cmd + '\n');
-    
-    cmd = "D,1," + sensor1Pumpdelay.getValueI();
-    arduinoPort.write(cmd + '\n');
-    cmd = "D,2," + sensor2Pumpdelay.getValueI();
-    arduinoPort.write(cmd + '\n');
-    cmd = "D,3," + sensor3Pumpdelay.getValueI();
-    arduinoPort.write(cmd + '\n');
-    
-    cmd = "H," + humidityInterval.getValueS();
-    arduinoPort.write(cmd + "\n");
-    
-    cmd = "K,1," + sensor1CalDry.getValueI();
-    arduinoPort.write(cmd + '\n');
-    cmd = "K,2," + sensor2CalDry.getValueI();
-    arduinoPort.write(cmd + '\n');
-    cmd = "K,3," + sensor3CalDry.getValueI();
-    arduinoPort.write(cmd + '\n');
-    
-    cmd = "W,1," + sensor1CalWet.getValueI();
-    arduinoPort.write(cmd + '\n');
-    cmd = "W,2," + sensor2CalWet.getValueI();
-    arduinoPort.write(cmd + '\n');
-    cmd = "W,3," + sensor3CalWet.getValueI();
-    arduinoPort.write(cmd + '\n');
-    
-    cmd = "S,";
-    arduinoPort.write(cmd + '\n');
-    saving = true;
+    sendingSave = true;
     showSavingPrompt();
+    
   }
 } //_CODE_:resetButton:668454:
 
