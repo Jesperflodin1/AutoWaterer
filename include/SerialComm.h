@@ -1,26 +1,15 @@
-#include <Arduino.h>
+#ifndef _SERIALCOMM_H
+#define _SERIALCOMM_H
 
-class GreenhouseController;
+namespace GreenhouseController::SerialComm {
 
-class SerialComm {
-private:
-    uint32_t m_prevMillisPing = 0;
-    const uint16_t m_pingInterval = 2000;
+bool prevMillisPingDelayPassed(uint32_t currentMillis = millis());
+bool prevMillisPingTimeoutPassed(uint32_t currentMillis = millis());
 
-    bool m_handshakeDone = false;
-    GreenhouseController* m_Controller;
+void tryHandshake(uint32_t currentMillis);
+void serialLoop(uint32_t currentMillis);
+void begin();
 
-    void ping();
-    void sendConfig();
-
-public:
-    SerialComm(GreenhouseController& controller);
-    bool prevMillisPingDelayPassed(uint32_t currentMillis = millis());
-    bool prevMillisPingTimeoutPassed(uint32_t currentMillis = millis());
-
-    void tryHandshake(uint32_t currentMillis);
-    void serialLoop(uint32_t currentMillis);
-    void begin();
-
-    bool connected() { return m_handshakeDone; }
-};
+bool connected();
+}
+#endif

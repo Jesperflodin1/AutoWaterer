@@ -33,4 +33,18 @@ const uint8_t HUMIDITYPOWER[NUM_SENSORS] = HUMIDITYPOWER_PINS;
 const uint8_t HUMIDITYSENS[NUM_SENSORS] = HUMIDITYSENS_PINS; // Sensor data pin for analog read
 const uint8_t RELAY[NUM_SENSORS] = RELAY_PINS;
 
+/* --- Default configuration --- */
+#define CFG_VERSION 0xA1
+
+#define CFG_SENSOR_ENABLE 1
+#define CFG_SENSOR_LIMIT 90
+#define CFG_SENSOR_PUMPTIME 14 // Sec
+#define CFG_SENSOR_MAXPUMPINGS 2
+#define CFG_SENSOR_PUMPTIMEOUT 48 // Hour
+#define CFG_SENSOR_PUMPDELAY 8 // Hour
+#define CFG_SENSOR_CALIBRATIONWET 660
+#define CFG_SENSOR_CALIBRATIONDRY 85
+
+#define CFG_HUMIDITYCHECKINTERVAL 30 // min
+
 #endif

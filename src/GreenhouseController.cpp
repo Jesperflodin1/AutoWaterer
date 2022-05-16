@@ -16,28 +16,31 @@
  * responsible for the use of all these cool tools.
  */
 #include "GreenhouseController.h"
-#include "SerialComm.h"
 
-#include <HardwareSerial.h>
+namespace GreenhouseController {
 
-GreenhouseController Greenhouse;
-Display ledDisplay;
-SerialComm serial { Greenhouse };
+namespace {
 
-void GreenhouseController::begin()
+    Sensor m_Sensors[NUM_SENSORS] {};
+    uint8_t m_lastUpdatedSensor { NUM_SENSORS - 1 };
+}
+Sensor& getSensor(uint8_t sensor) { return m_Sensors[sensor]; }
+unsigned long currentMillis = 0;
+
+void begin()
 {
     for (int i = 0; i < NUM_SENSORS; i++) {
         pinMode(HUMIDITYPOWER[i], OUTPUT);
         pinMode(HUMIDITYSENS[i], INPUT);
         pinMode(RELAY[i], OUTPUT);
-        m_Sensors[i] = Sensor(i, m_GreenhouseConfiguration);
+        // m_Sensors[i] = Sensor();
     }
-    ledDisplay.begin();
-    ledDisplay.showBoot();
-    m_GreenhouseConfiguration = GreenhouseControllerConfiguration();
+    Display::begin();
+    Display::showBoot();
+    SerialComm::begin();
 }
 
-void GreenhouseController::readSensors()
+void readSensors()
 {
     for (int i = 0; i < NUM_SENSORS; i++) {
         if (m_Sensors[i].enabled() == true) { // If current sensor is enabled
@@ -46,7 +49,7 @@ void GreenhouseController::readSensors()
     }
 }
 // 10 bytes
-byte* GreenhouseController::readSerializedSensors(byte* emptyBytes, char delimiter)
+byte* readSerializedSensors(byte* emptyBytes, char delimiter)
 {
     emptyBytes[0] = 'S';
     for (int i = 0; i < NUM_SENSORS; i++) {
@@ -58,72 +61,31 @@ byte* GreenhouseController::readSerializedSensors(byte* emptyBytes, char delimit
     return emptyBytes;
 }
 
-void GreenhouseController::handleSensor(uint8_t sensor)
+void handleSensor(uint8_t sensor)
 {
     if (m_Sensors[sensor].enabled() == true) { // If current sensor is enabled
         if (m_Sensors[sensor].intervalTimePassed(currentMillis, true)) {
             m_Sensors[sensor].readHumidity();
 
-            // Serial.print(F("Sensor "));
-            // Serial.println(m_Sensors[sensor].getID());
-
-            // Serial.print(F("prevMillisPump: "));
-            // Serial.println(m_Sensors[sensor].getPrevMillisPump());
-
             if (m_Sensors[sensor].pumpDelayPassed(currentMillis)) {
-                // Serial.println(F("Reset nPump"));
                 m_Sensors[sensor]
                     .resetPumpings();
             }
-
-            // Serial.print(F("getPumpings: "));
-            // Serial.println(m_Sensors[sensor].getPumpings());
-
             // Maxtime elapsed or humidity low
             if (m_Sensors[sensor].pumpTimeoutPassed(currentMillis, false) || (m_Sensors[sensor].lowHumidity() && m_Sensors[sensor].getPumpings() < 2)) {
-                // Serial.println(F("Pump triggered"));
                 m_Sensors[sensor].setPrevMillisPump(currentMillis);
-                ledDisplay.showPump(sensor);
+                Display::showPump(sensor);
                 m_Sensors[sensor].pump();
             }
         }
 
         if (sensor == (m_lastUpdatedSensor == NUM_SENSORS - 1 ? 0 : m_lastUpdatedSensor + 1)) {
-            if (ledDisplay.intervalTimePassed()) {
+            if (Display::intervalTimePassed()) {
                 m_lastUpdatedSensor = m_lastUpdatedSensor == NUM_SENSORS - 1 ? 0 : m_lastUpdatedSensor + 1;
 
-                ledDisplay.updateDisplay(sensor, m_Sensors[sensor].getHumidity());
+                Display::updateDisplay(sensor, m_Sensors[sensor].getHumidity());
             }
         }
     }
 }
-
-/* **** standard setup() function **** */
-void setup()
-{
-    Greenhouse = GreenhouseController();
-    Greenhouse.begin();
-    serial.begin();
-
-    Greenhouse.readSensors();
-    Serial.println((long)&Greenhouse, HEX);
-    Serial.println((long)Greenhouse.getSensor(0).m_Configuration, HEX);
-}
-
-void loop()
-{
-    Greenhouse.currentMillis = millis();
-
-    if (serial.connected()) {
-
-        serial.serialLoop(Greenhouse.currentMillis);
-    } else {
-        serial.tryHandshake(Greenhouse.currentMillis);
-        if (serial.connected())
-            ledDisplay.showUSB();
-
-        for (int i = 0; i < NUM_SENSORS; i++) {
-            Greenhouse.handleSensor(i);
-        }
-    }
 }

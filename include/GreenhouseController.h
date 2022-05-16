@@ -3,30 +3,22 @@
 
 #include "Display.h"
 #include "GreenhouseControllerConfiguration.h"
-#include "PinConfiguration.h"
+#include "Configuration.h"
 #include "Sensor.h"
+#include "SerialComm.h"
 
-class GreenhouseController {
+namespace GreenhouseController {
+extern unsigned long currentMillis; // stores the value of millis() in each iteration of loop()
 
-private:
-    Sensor m_Sensors[NUM_SENSORS] = { { 0, m_GreenhouseConfiguration }, { 1, m_GreenhouseConfiguration }, { 2, m_GreenhouseConfiguration } };
-    uint8_t m_lastUpdatedSensor { NUM_SENSORS - 1 };
+void begin();
 
-public:
-    GreenhouseControllerConfiguration m_GreenhouseConfiguration;
-    unsigned long currentMillis = 0; // stores the value of millis() in each iteration of loop()
+void readSensors();
 
-    void begin();
+byte* readSerializedSensors(byte* emptyBytes, char delimiter);
 
-    void readSensors();
+void handleSensor(uint8_t);
 
-    byte* readSerializedSensors(byte* emptyBytes, char delimiter);
-
-    void handleSensor(uint8_t);
-
-    Sensor& getSensor(uint8_t sensor) { return m_Sensors[sensor]; }
-
-    GreenhouseControllerConfiguration& getConfigurationController() { return m_GreenhouseConfiguration; }
-};
+Sensor& getSensor(uint8_t sensor);
+}
 
 #endif

@@ -1,10 +1,7 @@
 #ifndef _SENSOR_H
 #define _SENSOR_H
-//#include "GreenhouseControllerConfiguration.h"
 
-class GreenhouseController;
-class GreenhouseControllerConfiguration;
-
+namespace GreenhouseController {
 class Sensor {
 private:
     uint16_t m_rawValue { 0 };
@@ -17,8 +14,7 @@ private:
     unsigned long m_prevMillisHumidityCheck { 0 }; // time of previous humidity check
 
 public:
-    GreenhouseControllerConfiguration* m_Configuration;
-    Sensor(uint8_t m_sensorId, GreenhouseControllerConfiguration& config);
+    Sensor();
 
     // Check if interval in minutes has passed for this sensor
     bool intervalTimePassed(const uint32_t& currentMillis = millis(), bool autoReset = true);
@@ -43,8 +39,6 @@ public:
     void setPrevMillisPump(uint32_t millis) { m_prevMillisPump = millis; }
 
     uint8_t getID() const { return m_sensorId; }
-    uint32_t getPrevMillisPump() const { return m_prevMillisPump; }
-    uint32_t getPrevMillisHumidityCheck() const { return m_prevMillisHumidityCheck; }
 };
-
+}
 #endif

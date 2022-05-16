@@ -53,6 +53,7 @@ public void draw(){
         }
         if (connecting) {
           connecting = false; 
+          connectionProgress(100);
           hidePrompt();
         }
       } else if (sensorBytes != null) {
@@ -83,11 +84,13 @@ public void draw(){
         //arduinoPort.clear(); 
         connectStage = 1;
         prevMillisPing = millis();
+        connectionProgress(50);
         println("connectstage 1 done");
       } else if (connectStage == 1) {
         arduinoPort.bufferUntil('\n');
         connectStage = 2;
         prevMillisPing = millis();
+        connectionProgress(90);
         println("connectstage 2 done");
       } else if (currentMillis - prevMillisPing >= pingInterval*7) {
         println("SERIAL TIMEOUT WHEN CONNECTING!");
@@ -112,6 +115,7 @@ public void connectSerial(String port) {
     resetConnectionState();
     return;
   }
+  connectionProgress(10);
   prevMillisPing = millis();
   firstContact = false;
   connecting = true;
